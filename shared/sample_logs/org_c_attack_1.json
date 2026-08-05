@@ -1,0 +1,7 @@
+{
+  "timestamp": "2026-08-05T03:45:00Z",
+  "source_ip": "203.0.113.42",
+  "endpoint": "/api/v1/users",
+  "request_payload": "' UNION SELECT * FROM users --",
+  "response_code": 500
+}

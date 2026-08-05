@@ -1,0 +1,7 @@
+{
+  "timestamp": "2026-08-05T01:22:00Z",
+  "source_ip": "198.51.100.17",
+  "endpoint": "/api/v1/login",
+  "request_payload": "admin' --",
+  "response_code": 401
+}
