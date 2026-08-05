@@ -1,7 +1,8 @@
 {
-  "timestamp": "2026-08-05T03:45:00Z",
-  "source_ip": "203.0.113.42",
-  "endpoint": "/api/v1/users",
-  "request_payload": "' UNION SELECT * FROM users --",
-  "response_code": 500
+  "timestamp": "2026-08-05T04:30:00Z",
+  "source_ip": "198.51.100.99",
+  "endpoint": "/api/v1/login",
+  "attack_type": "Credential Stuffing",
+  "request_payload": "multiple rapid login attempts with leaked credential pairs",
+  "response_code": 401
 }
