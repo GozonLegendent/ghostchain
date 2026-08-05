@@ -1,0 +1,20 @@
+services:
+  org-a:
+    build: ./org-a
+    ports:
+      - "8001:8000"
+
+  org-b:
+    build: ./org-b
+    ports:
+      - "8002:8000"
+
+  org-c:
+    build: ./org-c
+    ports:
+      - "8004:8000"
+
+  master-ai:
+    build: ./master-ai
+    ports:
+      - "8003:8000"
