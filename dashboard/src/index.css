@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@keyframes dashflow {
+  to { stroke-dashoffset: -200; }
+}
+.flow-line {
+  animation: dashflow 8s linear infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.07); }
+}
+.breathe {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: breathe 3.2s ease-in-out infinite;
+}
