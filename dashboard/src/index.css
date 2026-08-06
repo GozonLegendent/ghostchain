@@ -1,11 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
-@keyframes dashflow {
-  to { stroke-dashoffset: -200; }
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Chakra Petch", ui-sans-serif, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
-.flow-line {
-  animation: dashflow 8s linear infinite;
-}
+
+/* ---- network graph ---- */
+@keyframes dashflow { to { stroke-dashoffset: -200; } }
+.flow-line { animation: dashflow 8s linear infinite; }
 
 @keyframes breathe {
   0%, 100% { transform: scale(1); }
@@ -16,3 +20,119 @@
   transform-origin: center;
   animation: breathe 3.2s ease-in-out infinite;
 }
+
+@keyframes floaty {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+.floaty {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: floaty 5.5s ease-in-out infinite;
+}
+
+/* ---- ambient ---- */
+.aurora {
+  position: absolute;
+  width: 55vw;
+  height: 55vw;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.1;
+}
+.aurora-1 { background: #0e7490; top: -18vw; right: -12vw; animation: drift1 26s ease-in-out infinite alternate; }
+.aurora-2 { background: #1e3a8a; bottom: -22vw; left: -14vw; animation: drift2 32s ease-in-out infinite alternate; }
+@keyframes drift1 { to { transform: translate(-12vw, 12vh) scale(1.15); } }
+@keyframes drift2 { to { transform: translate(10vw, -10vh) scale(1.1); } }
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.6; }
+  94% { opacity: 1; }
+  97% { opacity: 0.8; }
+  98% { opacity: 1; }
+}
+.scanlines {
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0px 1px, transparent 1px 3px);
+  animation: flicker 7s infinite;
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: #22d3ee;
+  box-shadow: 0 0 10px 3px rgba(34, 211, 238, 0.45);
+  opacity: 0.45;
+  animation: floaty 7s ease-in-out infinite;
+}
+
+/* ---- ctOS glitch text ---- */
+.glitch { position: relative; display: inline-block; }
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  opacity: 0.75;
+  pointer-events: none;
+}
+.glitch::before { color: #22d3ee; animation: glitch-a 3.1s infinite steps(1); }
+.glitch::after { color: #f87171; animation: glitch-b 2.7s infinite steps(1); }
+@keyframes glitch-a {
+  0%, 90%, 100% { clip-path: inset(0 0 100% 0); transform: none; }
+  91% { clip-path: inset(5% 0 70% 0); transform: translateX(-2px); }
+  93% { clip-path: inset(50% 0 20% 0); transform: translateX(2px); }
+  95% { clip-path: inset(75% 0 4% 0); transform: translateX(-1px); }
+  97% { clip-path: inset(25% 0 55% 0); transform: translateX(1.5px); }
+}
+@keyframes glitch-b {
+  0%, 88%, 100% { clip-path: inset(0 0 100% 0); transform: none; }
+  89% { clip-path: inset(60% 0 10% 0); transform: translateX(2px); }
+  92% { clip-path: inset(10% 0 75% 0); transform: translateX(-2px); }
+  95% { clip-path: inset(40% 0 40% 0); transform: translateX(1px); }
+}
+
+/* ---- HUD chrome ---- */
+.hatch {
+  background-image: repeating-linear-gradient(-45deg, rgba(34, 211, 238, 0.06) 0 6px, transparent 6px 12px);
+}
+.cut-corner {
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+
+.glow-text { text-shadow: 0 0 18px rgba(34, 211, 238, 0.45); }
+
+/* spotlight that follows the cursor (ReactBits SpotlightCard style) */
+.spotlight-card { position: relative; }
+.spotlight-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%), rgba(34, 211, 238, 0.12), transparent 65%);
+}
+.spotlight-card:hover::after { opacity: 1; }
+
+/* receding 3D floor grid for the network map */
+.grid-floor {
+  background-image:
+    linear-gradient(rgba(34, 211, 238, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.14) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+}
+
+@keyframes blink { 50% { opacity: 0; } }
+.cursor-blink { animation: blink 1.1s step-start infinite; }
+
+/* ---- custom scrollbar ---- */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #05070c; }
+::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #334155; }
