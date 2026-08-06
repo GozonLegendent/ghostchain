@@ -27,3 +27,12 @@ export function useIncidents(pollMs = 5000) {
 
   return incidents;
 }
+export async function verifyAll() {
+  const settled = await Promise.allSettled(
+    ORGS.map((o) => fetch(`${o.url}/verify`).then((r) => r.json()))
+  );
+  return ORGS.map((o, i) => ({
+    org: o,
+    data: settled[i].status === "fulfilled" ? settled[i].value : null,
+  }));
+}

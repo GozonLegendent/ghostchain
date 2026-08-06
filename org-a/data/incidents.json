@@ -1,0 +1,48 @@
+[
+  {
+    "source_org": "org_a",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-06T18:14:00Z",
+    "attacker_infrastructure": {
+      "source_ip": "203.0.113.42"
+    },
+    "raw_log": {
+      "timestamp": "2026-08-06T18:14:00Z",
+      "source_ip": "203.0.113.42",
+      "endpoint": "/api/v1/login",
+      "attack_type": "Credential Stuffing",
+      "request_payload": "credential list batch 1",
+      "response_code": 401
+    },
+    "ai_narrative": "Error generating narrative",
+    "evidence": {
+      "block_index": 0,
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "block_hash": "3937622774a190b743e3b658b482b188034dba754493eda7bee5dfdee4bedc8b"
+    }
+  },
+  {
+    "source_org": "org_a",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-06T18:16:00Z",
+    "attacker_infrastructure": {
+      "source_ip": "203.0.113.42"
+    },
+    "raw_log": {
+      "timestamp": "2026-08-06T18:16:00Z",
+      "source_ip": "203.0.113.42",
+      "endpoint": "/api/v1/login",
+      "attack_type": "Credential Stuffing",
+      "request_payload": "credential list batch 2",
+      "response_code": 401
+    },
+    "ai_narrative": "On August 6, 2026 at 6:16 PM UTC, an attacker attempted to perform a credential stuffing attack against the `/api/v1/login` endpoint using payload \"credential list batch 2\" from source IP 203.0.113.42, resulting in a 401 Unauthorized response.",
+    "evidence": {
+      "block_index": 1,
+      "prev_hash": "3937622774a190b743e3b658b482b188034dba754493eda7bee5dfdee4bedc8b",
+      "block_hash": "ac43bf85f97693d483bedddca4a5f3489a0d90cf255bf9748af08187bf7e81b1"
+    }
+  }
+]

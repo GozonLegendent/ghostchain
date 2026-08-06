@@ -3,16 +3,22 @@ services:
     build: ./org-a
     ports:
       - "8001:8000"
+    volumes:
+      - ./org-a/data:/app/data
 
   org-b:
     build: ./org-b
     ports:
       - "8002:8000"
+    volumes:
+      - ./org-b/data:/app/data
 
   org-c:
     build: ./org-c
     ports:
       - "8004:8000"
+    volumes:
+      - ./org-c/data:/app/data
 
   master-ai:
     build: ./master-ai

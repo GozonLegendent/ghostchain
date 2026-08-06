@@ -1,0 +1,25 @@
+[
+  {
+    "source_org": "org_c",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-06T19:05:00Z",
+    "attacker_infrastructure": {
+      "source_ip": "198.51.100.77"
+    },
+    "raw_log": {
+      "timestamp": "2026-08-06T19:05:00Z",
+      "source_ip": "198.51.100.77",
+      "endpoint": "/api/v1/login",
+      "attack_type": "Credential Stuffing",
+      "request_payload": "credential list batch 5",
+      "response_code": 401
+    },
+    "ai_narrative": "On August 6, 2026 at 3:05 PM UTC, an incident of credential stuffing occurred targeting the `/api/v1/login` endpoint with payload \"credential list batch 5\". The attack originated from IP address 198.51.100.77 and resulted in a 401 Unauthorized response.",
+    "evidence": {
+      "block_index": 0,
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "block_hash": "142afacdf9ba8eaa1afc95dd6feb44b56b0c4972721dadaf65d352ebc2b6ac9a"
+    }
+  }
+]

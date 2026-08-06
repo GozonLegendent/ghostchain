@@ -1,0 +1,48 @@
+[
+  {
+    "source_org": "org_b",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-06T18:22:00Z",
+    "attacker_infrastructure": {
+      "source_ip": "203.0.113.42"
+    },
+    "raw_log": {
+      "timestamp": "2026-08-06T18:22:00Z",
+      "source_ip": "203.0.113.42",
+      "endpoint": "/api/v1/login",
+      "attack_type": "Credential Stuffing",
+      "request_payload": "credential list batch 3",
+      "response_code": 401
+    },
+    "ai_narrative": "At 6:22 PM UTC on August 6, an attempt was made to perform a Credential Stuffing attack targeting the /api/v1/login endpoint of the system, using a batch of credentials labeled as batch 3. The source IP address was 203.0.113.42, and the attack resulted in a 401 Unauthorized response.",
+    "evidence": {
+      "block_index": 0,
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "block_hash": "1d55cc57df31afaf08339aa5cdd780db705df68238eb83fbe7f885c793f7bb85"
+    }
+  },
+  {
+    "source_org": "org_b",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-06T18:25:00Z",
+    "attacker_infrastructure": {
+      "source_ip": "203.0.113.42"
+    },
+    "raw_log": {
+      "timestamp": "2026-08-06T18:25:00Z",
+      "source_ip": "203.0.113.42",
+      "endpoint": "/api/v1/login",
+      "attack_type": "Credential Stuffing",
+      "request_payload": "credential list batch 4",
+      "response_code": 401
+    },
+    "ai_narrative": "At 6:25 PM UTC on August 6, an incident occurred where a source IP address (203.0.113.42) attempted to exploit a credential stuffing attack by submitting batch 4 of a credential list targeting the `/api/v1/login` endpoint. The attack resulted in a 401 Unauthorized response.",
+    "evidence": {
+      "block_index": 1,
+      "prev_hash": "1d55cc57df31afaf08339aa5cdd780db705df68238eb83fbe7f885c793f7bb85",
+      "block_hash": "7f111f417f77ee03ebe09f09e62cca0b2fe197f758c2c13b89befb6436623995"
+    }
+  }
+]
