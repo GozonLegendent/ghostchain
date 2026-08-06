@@ -1,8 +1,33 @@
 ﻿from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import requests
+import json
+import os
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+DATA_FILE = "data/incidents.json"
+
+def load_incidents():
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, "r") as f:
+            return json.load(f)
+    return []
+
+def save_incident(incident):
+    incidents = load_incidents()
+    incidents.append(incident)
+    os.makedirs("data", exist_ok=True)
+    with open(DATA_FILE, "w") as f:
+        json.dump(incidents, f, indent=2)
 
 class AttackLog(BaseModel):
     timestamp: str
@@ -12,7 +37,6 @@ class AttackLog(BaseModel):
     request_payload: str
     response_code: int
 
-# Simple lookup table — expand later if you add more attack types
 MITRE_MAP = {
     "Credential Stuffing": "T1110.004",
     "SQL Injection": "T1190"
@@ -44,7 +68,7 @@ Write only the summary, nothing else."""
     )
     narrative = response.json().get("response", "Error generating narrative")
 
-    return {
+    incident = {
         "source_org": "org_a",
         "attack_type": log.attack_type,
         "mitre_technique": technique_id,
@@ -55,3 +79,10 @@ Write only the summary, nothing else."""
         "raw_log": log.dict(),
         "ai_narrative": narrative
     }
+
+    save_incident(incident)
+    return incident
+
+@app.get("/incidents")
+def get_incidents():
+    return load_incidents()
