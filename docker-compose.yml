@@ -24,3 +24,5 @@ services:
     build: ./master-ai
     ports:
       - "8003:8000"
+    volumes:
+      - ./master-ai/data:/app/data

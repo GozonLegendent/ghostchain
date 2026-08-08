@@ -1,15 +1,20 @@
 import { useEffect, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
-import { Hexagon } from "lucide-react";
+import { Hexagon, LogOut } from "lucide-react";
 import GlitchText from "./components/GlitchText";
+import { useAuth, ROLE_LABELS, ROLES } from "./auth";
 
-const NAV = [
-  { to: "/", label: "Overview" },
-  { to: "/incidents", label: "Live Incidents" },
-  { to: "/campaigns", label: "Threat Campaigns" },
-  { to: "/evidence", label: "Evidence Vault" },
-  { to: "/audit", label: "Audit Portal" },
-];
+function getNav(role) {
+  const isAuthority = role === ROLES.AUTHORITY;
+  const items = [{ to: "/", label: "Overview" }];
+  if (!isAuthority) items.push({ to: "/incidents", label: "Live Incidents" });
+  items.push({ to: "/campaigns", label: "Threat Campaigns" });
+  items.push({ to: "/reports", label: "Sanitized Reports" });
+  if (!isAuthority) items.push({ to: "/evidence", label: "Evidence Vault" });
+  items.push({ to: "/audit", label: isAuthority ? "Verdict Ledger" : "Audit Portal" });
+  if (isAuthority) items.push({ to: "/analysis", label: "Network Analysis" });
+  return items;
+}
 
 const PARTICLES = [
   { top: "18%", left: "6%", size: 3, delay: "0s" },
@@ -28,71 +33,112 @@ function HudTicker() {
   useEffect(() => {
     const t = setInterval(() => {
       setNow(new Date());
-      setHex("0x" + Math.floor(Math.random() * 0xffff).toString(16).toUpperCase().padStart(4, "0"));
+      setHex(
+        "0x" +
+          Math.floor(Math.random() * 0xffff)
+            .toString(16)
+            .toUpperCase()
+            .padStart(4, "0")
+      );
     }, 1000);
     return () => clearInterval(t);
   }, []);
 
   return (
-    <div className="flex items-center gap-4 font-mono text-[10px] text-slate-500">
+    <div className="flex items-center gap-4 font-mono text-[11px] text-cyan-400/70">
       <span>{now.toISOString().slice(11, 19)} UTC</span>
-      <span className="text-cyan-500/80">{hex}</span>
-      <span className="hidden md:inline">30.9010N 75.8573E</span>
-      <span className="flex items-center gap-2 text-emerald-400">
-        <span className="relative flex h-2 w-2">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-        </span>
+      <span className="text-cyan-500/50">{hex}</span>
+      <span className="hidden sm:inline">30.9010N 75.8573E</span>
+      <span className="flex items-center gap-1.5 text-emerald-400">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
         ONLINE
       </span>
     </div>
   );
 }
 
-export default function App() {
-  return (
-    <div className="min-h-screen bg-[#05070c] font-sans text-slate-100">
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="aurora aurora-1" />
-        <div className="aurora aurora-2" />
-        <div className="scanlines absolute inset-0" />
-        {PARTICLES.map((p, i) => (
-          <span
-            key={i}
-            className="particle"
-            style={{ top: p.top, left: p.left, width: p.size, height: p.size, animationDelay: p.delay }}
-          />
-        ))}
-      </div>
+function IdentityBadge() {
+  const { role, logout } = useAuth();
+  if (!role) return null;
 
-      <div className="relative">
-        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-slate-800/80 bg-[#05070c]/70 px-6 py-3 backdrop-blur-md">
-          <div className="flex items-center gap-8">
-            <span className="flex items-center gap-2">
-              <Hexagon className="h-5 w-5 animate-pulse text-cyan-400" strokeWidth={1.6} />
-              <GlitchText text="GHOSTCHAIN" className="font-display text-lg font-bold tracking-[0.25em] text-white" />
+  return (
+    <div className="flex items-center gap-3 font-mono text-xs">
+      <span className="px-2 py-1 border border-cyan-500/30 rounded text-cyan-300/90">
+        {ROLE_LABELS[role]}
+      </span>
+      <button
+        onClick={logout}
+        className="flex items-center gap-1 text-slate-500 hover:text-rose-300 transition-colors"
+      >
+        <LogOut className="w-3.5 h-3.5" />
+        <span className="hidden sm:inline">Exit</span>
+      </button>
+    </div>
+  );
+}
+
+export default function App() {
+  const { role } = useAuth();
+  const NAV = getNav(role);
+
+  return (
+    <div className="relative min-h-screen bg-[#05070c] text-slate-200 overflow-x-hidden">
+      <div className="aurora aurora-1" />
+      <div className="aurora aurora-2" />
+      <div className="scanlines fixed inset-0 pointer-events-none z-0" />
+
+      {PARTICLES.map((p, i) => (
+        <span
+          key={i}
+          className="particle"
+          style={{
+            top: p.top,
+            left: p.left,
+            width: p.size,
+            height: p.size,
+            animationDelay: p.delay,
+          }}
+        />
+      ))}
+
+      <header className="relative z-10 border-b border-cyan-500/20 bg-[#05070c]/80 backdrop-blur-sm">
+        <div className="flex items-center justify-between px-6 py-3 flex-wrap gap-3">
+          <div className="flex items-center gap-2">
+            <Hexagon className="w-6 h-6 text-cyan-400" strokeWidth={1.6} />
+            <span className="font-display text-lg text-cyan-100 tracking-wide">
+              <GlitchText text="GHOSTCHAIN" />
             </span>
-            <nav className="font-display flex gap-5 text-[11px] uppercase tracking-widest">
-              {NAV.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  end={item.to === "/"}
-                  className={({ isActive }) =>
-                    isActive
-                      ? "border-b-2 border-cyan-400 pb-1 text-cyan-400"
-                      : "text-slate-500 transition-colors hover:text-cyan-300"
-                  }
-                >
-                  {item.label}
-                </NavLink>
-              ))}
-            </nav>
           </div>
-          <HudTicker />
-        </header>
+
+          <nav className="flex items-center gap-6 font-mono text-xs uppercase tracking-wider">
+            {NAV.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === "/"}
+                className={({ isActive }) =>
+                  `pb-1 border-b-2 transition-colors ${
+                    isActive
+                      ? "border-cyan-400 text-cyan-300"
+                      : "border-transparent text-slate-500 hover:text-cyan-300/80"
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-4">
+            <HudTicker />
+            <IdentityBadge />
+          </div>
+        </div>
+      </header>
+
+      <main className="relative z-10">
         <Outlet />
-      </div>
+      </main>
     </div>
   );
 }

@@ -1,0 +1,87 @@
+[
+  {
+    "source_org": "org_c",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-06T19:05:00Z",
+    "attacker_infrastructure": {
+      "source_ip": "198.51.100.77",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/login"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_a",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-06T18:14:00Z",
+    "attacker_infrastructure": {
+      "source_ip": "203.0.113.42",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/login"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_a",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-06T18:16:00Z",
+    "attacker_infrastructure": {
+      "source_ip": "203.0.113.42",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/login"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_b",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-06T18:22:00Z",
+    "attacker_infrastructure": {
+      "source_ip": "203.0.113.42",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/login"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_b",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-06T18:25:00Z",
+    "attacker_infrastructure": {
+      "source_ip": "203.0.113.42",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/login"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  }
+]

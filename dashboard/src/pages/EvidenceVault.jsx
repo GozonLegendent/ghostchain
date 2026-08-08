@@ -1,16 +1,56 @@
 import { useCallback, useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { Link2, ShieldCheck, ShieldAlert, RefreshCw, Database } from "lucide-react";
-import { verifyAll } from "../api";
+import { Link2, ShieldCheck, ShieldAlert, RefreshCw, Database, Send, Clock } from "lucide-react";
+import { verifyAll, submitCustody, useVerdicts } from "../api";
+import { useAuth } from "../auth";
 import Page from "../components/Page";
 import HudPanel from "../components/HudPanel";
 import DecryptedText from "../components/DecryptedText";
 import GlitchText from "../components/GlitchText";
 
+function fmtTime(ts) {
+  if (!ts) return "—";
+  return new Date(ts).toLocaleString(undefined, {
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+}
+
+function VerdictBadge({ verdict, status }) {
+  if (status === "pending") {
+    return (
+      <span className="flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 border border-amber-400/40 text-amber-300 rounded">
+        <Clock className="w-3 h-3" /> PENDING REVIEW
+      </span>
+    );
+  }
+  if (verdict === "VERIFIED") {
+    return (
+      <span className="flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 border border-emerald-400/40 text-emerald-300 rounded">
+        <ShieldCheck className="w-3 h-3" /> VERIFIED
+      </span>
+    );
+  }
+  return (
+    <span className="flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 border border-rose-500/40 text-rose-300 rounded">
+      <ShieldAlert className="w-3 h-3" /> TAMPERED
+    </span>
+  );
+}
+
 export default function EvidenceVault() {
+  const { role } = useAuth();
   const [reports, setReports] = useState(null);
   const [scanning, setScanning] = useState(false);
   const [sel, setSel] = useState(null);
+
+  const { verdicts, loading: verdictsLoading, refresh: refreshVerdicts } = useVerdicts();
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
+  const [lastSubmission, setLastSubmission] = useState(null);
 
   const runVerify = useCallback(async () => {
     setScanning(true);
@@ -29,6 +69,24 @@ export default function EvidenceVault() {
     sel && reports
       ? reports.find((r) => r.org.id === sel.orgId)?.data?.blocks?.[sel.idx]
       : null;
+
+  async function onSubmitCustody() {
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const mine = reports?.find((r) => r.org.id === role);
+      if (!mine?.data?.blocks?.length) {
+        throw new Error("no evidence blocks found for this org");
+      }
+      const res = await submitCustody(role, mine.data.blocks);
+      setLastSubmission(res);
+      await refreshVerdicts();
+    } catch (e) {
+      setSubmitError(e.message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   return (
     <Page className="space-y-4 p-4">
@@ -152,6 +210,56 @@ export default function EvidenceVault() {
           </div>
         </HudPanel>
       ) : null}
+
+      <HudPanel title="// SUBMIT TO AUTHORITY FOR VERIFICATION" icon={Send}>
+        <div className="p-4">
+          <p className="font-mono text-xs text-slate-500 mb-4 leading-relaxed">
+            Submit your hash-chain to GhostChain Authority for independent verification. Authority
+            sees the evidence chain to verify it — the network only ever sees the resulting verdict,
+            never the underlying blocks.
+          </p>
+          <button
+            onClick={onSubmitCustody}
+            disabled={submitting}
+            className="cut-corner font-display flex items-center gap-2 bg-cyan-500 px-4 py-2.5 text-xs font-semibold uppercase tracking-widest text-black hover:bg-cyan-400 transition-colors disabled:opacity-50"
+          >
+            <Send className="w-3.5 h-3.5" />
+            Submit for Verification
+          </button>
+          {submitError && (
+            <p className="font-mono text-xs text-rose-400 mt-3">// {submitError}</p>
+          )}
+          {lastSubmission && (
+            <p className="font-mono text-xs text-emerald-400 mt-3">
+              // submitted — awaiting Authority review ({lastSubmission.submission_id})
+            </p>
+          )}
+        </div>
+      </HudPanel>
+
+      <HudPanel title="// NETWORK VERDICT LEDGER" icon={ShieldCheck}>
+        {verdictsLoading ? (
+          <div className="p-6 text-center font-mono text-xs text-slate-500">loading…</div>
+        ) : verdicts.length === 0 ? (
+          <div className="p-6 text-center font-mono text-xs text-slate-500">
+            // no verdicts issued across the network yet
+          </div>
+        ) : (
+          <div className="divide-y divide-slate-800">
+            {verdicts.map((v) => (
+              <div key={v.submission_id} className="flex items-center justify-between p-4">
+                <div>
+                  <div className="font-mono text-sm text-cyan-200">{v.org_id.toUpperCase()}</div>
+                  <div className="font-mono text-[11px] text-slate-500 mt-0.5">
+                    {v.status === "pending" ? "submitted" : "analyzed"} {fmtTime(v.analyzed_at || v.submitted_at)}
+                  </div>
+                </div>
+                <VerdictBadge verdict={v.verdict} status={v.status} />
+              </div>
+            ))}
+          </div>
+        )}
+      </HudPanel>
     </Page>
   );
 }

@@ -7,6 +7,16 @@
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
+/* ---- base page background (fixes white space below short content) ---- */
+html, body, #root {
+  background-color: #05070c;
+  min-height: 100vh;
+}
+
+body {
+  margin: 0;
+}
+
 /* ---- network graph ---- */
 @keyframes dashflow { to { stroke-dashoffset: -200; } }
 .flow-line { animation: dashflow 8s linear infinite; }

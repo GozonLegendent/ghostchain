@@ -4,10 +4,12 @@ from pydantic import BaseModel
 import requests
 import json
 import os
+import re
 import hashlib
 
 ORG_ID = "org_a"
 GENESIS = "0" * 64
+MASTER_URL = "http://master-ai:8000"
 
 app = FastAPI()
 
@@ -41,7 +43,6 @@ def compute_block_hash(prev_hash, index, core_json):
     return hashlib.sha256(f"{prev_hash}|{index}|{core_json}".encode()).hexdigest()
 
 def ensure_chain():
-    """Upgrade any legacy incidents (saved before Phase 2) into the chain."""
     incidents = load_incidents()
     changed = False
     prev = GENESIS
@@ -70,6 +71,65 @@ def save_incident(incident):
     }
     incidents.append(incident)
     write_incidents(incidents)
+
+# ---- PHASE 3: privacy filter + sanitized report exchange ----
+
+EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+")
+ACCOUNT_RE = re.compile(r"(user(name)?|acct|account|password|token)[=:]\S+", re.IGNORECASE)
+
+def scrub(text):
+    """Regex PII scrubber: removes emails and account-style tokens from free text."""
+    text = EMAIL_RE.sub("[REDACTED_EMAIL]", text)
+    text = ACCOUNT_RE.sub("[REDACTED_CREDENTIAL]", text)
+    return text
+
+ATTACK_KNOWLEDGE = {
+    "Credential Stuffing": {
+        "iocs": ["high-volume failed logins from a single source IP on {endpoint}"],
+        "behaviour": "automated credential stuffing using breached credential lists",
+        "rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+        "confidence": 0.9,
+    },
+    "SQL Injection": {
+        "iocs": ["repeated malformed SQL queries on {endpoint}"],
+        "behaviour": "SQL injection probing for data access or privilege escalation",
+        "rule": "monitor repeated malformed SQL queries on API endpoints",
+        "confidence": 0.85,
+    },
+}
+DEFAULT_KNOWLEDGE = {
+    "iocs": ["anomalous request patterns on {endpoint}"],
+    "behaviour": "unclassified suspicious activity",
+    "rule": "review anomalous request patterns on the affected endpoint",
+    "confidence": 0.5,
+}
+
+def sanitize_report(incident):
+    """Whitelist projection — raw_log, payloads and narratives NEVER leave the org."""
+    k = ATTACK_KNOWLEDGE.get(incident["attack_type"], DEFAULT_KNOWLEDGE)
+    endpoint = incident.get("raw_log", {}).get("endpoint", "unknown endpoint")
+    return {
+        "source_org": incident["source_org"],
+        "attack_type": incident["attack_type"],
+        "mitre_technique": incident["mitre_technique"],
+        "timestamp": incident["timestamp"],
+        "attacker_infrastructure": {
+            "source_ip": incident["attacker_infrastructure"]["source_ip"],
+            "asn_or_host": "unknown/demo",
+            "approx_geolocation": "unknown/demo",
+        },
+        "indicators_of_compromise": [scrub(i.format(endpoint=endpoint)) for i in k["iocs"]],
+        "observed_behaviour": scrub(k["behaviour"]),
+        "recommended_detection_rule": scrub(k["rule"]),
+        "confidence": k["confidence"],
+    }
+
+def submit_to_master(report):
+    try:
+        r = requests.post(f"{MASTER_URL}/reports", json=report, timeout=5)
+        return r.status_code == 200
+    except requests.RequestException:
+        return False
 
 class AttackLog(BaseModel):
     timestamp: str
@@ -123,11 +183,24 @@ Write only the summary, nothing else."""
     }
 
     save_incident(incident)
-    return incident
+    shared = submit_to_master(sanitize_report(incident))
+    return {**incident, "shared_with_master": shared}
 
 @app.get("/incidents")
 def get_incidents():
     return load_incidents()
+
+@app.get("/sanitized")
+def get_sanitized():
+    """What this org actually shares — for the privacy before/after demo."""
+    return [sanitize_report(i) for i in load_incidents()]
+
+@app.post("/sync_reports")
+def sync_reports():
+    """Backfill: push sanitized reports for all stored incidents to master-ai."""
+    incidents = load_incidents()
+    sent = sum(1 for i in incidents if submit_to_master(sanitize_report(i)))
+    return {"org": ORG_ID, "reports_sent": sent, "total_incidents": len(incidents)}
 
 @app.get("/verify")
 def verify_chain():
@@ -159,3 +232,18 @@ def verify_chain():
         "block_count": len(blocks),
         "blocks": blocks,
     }
+@app.get("/lookup")
+def lookup_identifier(identifier: str):
+    incidents = load_incidents()
+    identifier_lower = identifier.strip().lower()
+    matches = []
+    for inc in incidents:
+        payload = str(inc.get("raw_log", {}).get("request_payload", "")).lower()
+        if identifier_lower and identifier_lower in payload:
+            matches.append({
+                "org": ORG_ID,
+                "attack_type": inc["attack_type"],
+                "timestamp": inc["timestamp"],
+                "endpoint": inc.get("raw_log", {}).get("endpoint", "unknown"),
+            })
+    return {"org": ORG_ID, "exposed": len(matches) > 0, "matches": matches}
