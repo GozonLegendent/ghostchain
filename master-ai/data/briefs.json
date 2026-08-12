@@ -2,5 +2,9 @@
   "203.0.113.42": {
     "text": "Campaign **camp_2026_08_06_001** involves the use of automated credential stuffing against multiple organizations\u2014**org_a** and **org_b**. These attacks are correlated by the shared infrastructure fingerprint (IP: 203.0.113.42) and appear to be leveraging breached credential lists for their operations. One recommended defensive action is to implement multi-factor authentication (MFA) across all affected systems to enhance account security and reduce the risk of successful attacks.",
     "report_count": 4
+  },
+  "198.51.100.77": {
+    "text": "TC-02 has been observed engaging in credential stuffing attacks against org_c using an attacker infrastructure fingerprint linked to 198.51.100.77. The campaigns share this infrastructure fingerprint, indicating coordination between multiple targets and potential larger scale operations. Recommended defensive action is to implement multi-factor authentication (MFA) for all user accounts to mitigate the impact of such attacks.",
+    "report_count": 1
   }
 }

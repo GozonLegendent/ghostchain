@@ -13,6 +13,7 @@ import AuditPortal from "./pages/AuditPortal";
 import NetworkAnalysis from "./pages/NetworkAnalysis";
 import "./index.css";
 import SanitizedReports from "./pages/SanitizedReports";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 function ProtectedRoute({ children }) {
   const { role } = useAuth();
@@ -22,30 +23,32 @@ function ProtectedRoute({ children }) {
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          <Route path="login" element={<Login />} />
-          <Route path="audit-my-data" element={<PersonalAudit />} />
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
+            <Route path="login" element={<Login />} />
+            <Route path="audit-my-data" element={<PersonalAudit />} />
 
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <App />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<Overview />} />
-            <Route path="incidents" element={<LiveIncidents />} />
-            <Route path="campaigns" element={<ThreatCampaigns />} />
-            <Route path="reports" element={<SanitizedReports />} />
-            <Route path="evidence" element={<EvidenceVault />} />
-            <Route path="audit" element={<AuditPortal />} />
-            <Route path="analysis" element={<NetworkAnalysis />} />
-          </Route>
-        </Routes>
-      </AuthProvider>
-    </BrowserRouter>
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <App />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Overview />} />
+              <Route path="incidents" element={<LiveIncidents />} />
+              <Route path="campaigns" element={<ThreatCampaigns />} />
+              <Route path="reports" element={<SanitizedReports />} />
+              <Route path="evidence" element={<EvidenceVault />} />
+              <Route path="audit" element={<AuditPortal />} />
+              <Route path="analysis" element={<NetworkAnalysis />} />
+            </Route>
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   </React.StrictMode>
 );

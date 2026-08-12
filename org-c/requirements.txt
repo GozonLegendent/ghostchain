@@ -2,3 +2,4 @@ fastapi
 uvicorn
 requests
 pydantic
+pyjwt==2.9.0

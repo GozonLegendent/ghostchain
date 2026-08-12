@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Hexagon, ShieldCheck, Building2 } from "lucide-react";
+import { Hexagon, ShieldCheck, Building2, Loader2 } from "lucide-react";
 import { useAuth, ROLES, ROLE_LABELS } from "../auth";
 import GlitchText from "../components/GlitchText";
 
@@ -15,11 +15,29 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [selected, setSelected] = useState(null);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  function handleEnter() {
-    if (!selected) return;
-    login(selected);
-    navigate("/");
+  function selectIdentity(role) {
+    setSelected(role);
+    setError(null);
+  }
+
+  async function handleEnter(e) {
+    e.preventDefault();
+    if (!selected || !username || !password) return;
+    setLoading(true);
+    setError(null);
+    try {
+      await login(selected, username, password);
+      navigate("/");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -40,7 +58,7 @@ export default function Login() {
           {OPTIONS.map(({ role, icon: Icon, desc }) => (
             <button
               key={role}
-              onClick={() => setSelected(role)}
+              onClick={() => selectIdentity(role)}
               className={`flex items-center gap-4 cut-corner border px-5 py-4 text-left transition-colors ${
                 selected === role
                   ? "border-cyan-400/60 bg-cyan-500/10"
@@ -58,13 +76,39 @@ export default function Login() {
           ))}
         </div>
 
-        <button
-          onClick={handleEnter}
-          disabled={!selected}
-          className="cut-corner font-display w-full mt-6 bg-cyan-500 py-3 text-sm font-semibold uppercase tracking-widest text-black transition-colors hover:bg-cyan-400 disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          Enter Network
-        </button>
+        {selected && (
+          <form onSubmit={handleEnter} className="mt-4 space-y-3">
+            <input
+              type="text"
+              placeholder="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              autoComplete="username"
+              className="w-full bg-slate-950/60 border border-slate-800 focus:border-cyan-400/60 outline-none px-4 py-2.5 font-mono text-sm text-slate-200 cut-corner"
+            />
+            <input
+              type="password"
+              placeholder="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              className="w-full bg-slate-950/60 border border-slate-800 focus:border-cyan-400/60 outline-none px-4 py-2.5 font-mono text-sm text-slate-200 cut-corner"
+            />
+
+            {error && (
+              <p className="font-mono text-xs text-rose-400">// {error}</p>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading || !username || !password}
+              className="cut-corner font-display flex items-center justify-center gap-2 w-full bg-cyan-500 py-3 text-sm font-semibold uppercase tracking-widest text-black transition-colors hover:bg-cyan-400 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+              {loading ? "Authenticating…" : "Enter Network"}
+            </button>
+          </form>
+        )}
 
         <p className="text-center font-mono text-[10px] text-slate-600 mt-4">
           individuals checking personal breach exposure:{" "}

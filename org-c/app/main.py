@@ -1,4 +1,4 @@
-﻿from fastapi import FastAPI
+﻿from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import requests
@@ -7,10 +7,14 @@ import os
 import re
 import hashlib
 
+from auth import create_token, require_role
+
 ORG_ID = "org_c"
 GENESIS = "0" * 64
 MASTER_URL = "http://master-ai:8000"
 
+ORG_USERNAME = os.environ.get("ORG_USERNAME", "org_c")
+ORG_PASSWORD = os.environ.get("ORG_PASSWORD", "changeme_c")
 app = FastAPI()
 
 app.add_middleware(
@@ -22,16 +26,19 @@ app.add_middleware(
 
 DATA_FILE = "data/incidents.json"
 
+
 def load_incidents():
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, "r") as f:
             return json.load(f)
     return []
 
+
 def write_incidents(incidents):
     os.makedirs("data", exist_ok=True)
     with open(DATA_FILE, "w") as f:
         json.dump(incidents, f, indent=2)
+
 
 # ---- evidence hash-chain ----
 
@@ -39,8 +46,10 @@ def canonical_content(incident):
     core = {k: v for k, v in incident.items() if k != "evidence"}
     return json.dumps(core, sort_keys=True, separators=(",", ":"))
 
+
 def compute_block_hash(prev_hash, index, core_json):
     return hashlib.sha256(f"{prev_hash}|{index}|{core_json}".encode()).hexdigest()
+
 
 def ensure_chain():
     incidents = load_incidents()
@@ -58,7 +67,9 @@ def ensure_chain():
     if changed:
         write_incidents(incidents)
 
+
 ensure_chain()
+
 
 def save_incident(incident):
     incidents = load_incidents()
@@ -72,16 +83,19 @@ def save_incident(incident):
     incidents.append(incident)
     write_incidents(incidents)
 
+
 # ---- PHASE 3: privacy filter + sanitized report exchange ----
 
 EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+")
 ACCOUNT_RE = re.compile(r"(user(name)?|acct|account|password|token)[=:]\S+", re.IGNORECASE)
+
 
 def scrub(text):
     """Regex PII scrubber: removes emails and account-style tokens from free text."""
     text = EMAIL_RE.sub("[REDACTED_EMAIL]", text)
     text = ACCOUNT_RE.sub("[REDACTED_CREDENTIAL]", text)
     return text
+
 
 ATTACK_KNOWLEDGE = {
     "Credential Stuffing": {
@@ -104,6 +118,7 @@ DEFAULT_KNOWLEDGE = {
     "confidence": 0.5,
 }
 
+
 def sanitize_report(incident):
     """Whitelist projection — raw_log, payloads and narratives NEVER leave the org."""
     k = ATTACK_KNOWLEDGE.get(incident["attack_type"], DEFAULT_KNOWLEDGE)
@@ -124,12 +139,14 @@ def sanitize_report(incident):
         "confidence": k["confidence"],
     }
 
+
 def submit_to_master(report):
     try:
         r = requests.post(f"{MASTER_URL}/reports", json=report, timeout=5)
         return r.status_code == 200
     except requests.RequestException:
         return False
+
 
 class AttackLog(BaseModel):
     timestamp: str
@@ -139,14 +156,29 @@ class AttackLog(BaseModel):
     request_payload: str
     response_code: int
 
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
 MITRE_MAP = {
     "Credential Stuffing": "T1110.004",
     "SQL Injection": "T1190"
 }
 
+
 @app.get("/health")
 def health():
     return {"status": f"{ORG_ID} is running"}
+
+
+@app.post("/login")
+def login(req: LoginRequest):
+    if req.username == ORG_USERNAME and req.password == ORG_PASSWORD:
+        return {"token": create_token(ORG_ID), "role": ORG_ID}
+    raise HTTPException(status_code=401, detail="invalid credentials")
+
 
 @app.post("/ingest")
 def ingest_log(log: AttackLog):
@@ -186,14 +218,17 @@ Write only the summary, nothing else."""
     shared = submit_to_master(sanitize_report(incident))
     return {**incident, "shared_with_master": shared}
 
+
 @app.get("/incidents")
-def get_incidents():
+def get_incidents(_=Depends(require_role(ORG_ID))):
     return load_incidents()
+
 
 @app.get("/sanitized")
 def get_sanitized():
     """What this org actually shares — for the privacy before/after demo."""
     return [sanitize_report(i) for i in load_incidents()]
+
 
 @app.post("/sync_reports")
 def sync_reports():
@@ -201,6 +236,7 @@ def sync_reports():
     incidents = load_incidents()
     sent = sum(1 for i in incidents if submit_to_master(sanitize_report(i)))
     return {"org": ORG_ID, "reports_sent": sent, "total_incidents": len(incidents)}
+
 
 @app.get("/verify")
 def verify_chain():
@@ -232,6 +268,8 @@ def verify_chain():
         "block_count": len(blocks),
         "blocks": blocks,
     }
+
+
 @app.get("/lookup")
 def lookup_identifier(identifier: str):
     incidents = load_incidents()

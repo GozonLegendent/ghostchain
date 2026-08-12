@@ -1,10 +1,16 @@
-﻿from fastapi import FastAPI, HTTPException, Body
+﻿from fastapi import FastAPI, HTTPException, Body, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import requests
 import json
 import os
 import hashlib
 import time
+
+from auth import create_token, require_role
+
+AUTHORITY_USERNAME = os.environ.get("AUTHORITY_USERNAME", "authority")
+AUTHORITY_PASSWORD = os.environ.get("AUTHORITY_PASSWORD", "changeme_authority")
 
 app = FastAPI()
 
@@ -18,29 +24,48 @@ app.add_middleware(
 DATA_FILE = "data/reports.json"
 BRIEF_FILE = "data/briefs.json"
 
+
 def load_json(path, default):
     if os.path.exists(path):
         with open(path, "r") as f:
             return json.load(f)
     return default
 
+
 def write_json(path, data):
     os.makedirs("data", exist_ok=True)
     with open(path, "w") as f:
         json.dump(data, f, indent=2)
 
+
 FORBIDDEN_FIELDS = {"raw_log", "ai_narrative", "request_payload", "response_code", "evidence"}
 REQUIRED_FIELDS = {"source_org", "attack_type", "mitre_technique", "timestamp", "attacker_infrastructure"}
+
 
 def fingerprint_of(report):
     return report.get("attacker_infrastructure", {}).get("source_ip", "unknown")
 
+
 def dedup_key(r):
     return f'{r.get("source_org")}|{r.get("timestamp")}|{fingerprint_of(r)}|{r.get("attack_type")}'
+
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
 
 @app.get("/health")
 def health():
     return {"status": "master-ai is running"}
+
+
+@app.post("/login")
+def login(req: LoginRequest):
+    if req.username == AUTHORITY_USERNAME and req.password == AUTHORITY_PASSWORD:
+        return {"token": create_token("authority"), "role": "authority"}
+    raise HTTPException(status_code=401, detail="invalid credentials")
+
 
 @app.post("/reports")
 def receive_report(report: dict = Body(...)):
@@ -58,6 +83,7 @@ def receive_report(report: dict = Body(...)):
     reports.append(report)
     write_json(DATA_FILE, reports)
     return {"stored": True, "total_reports": len(reports)}
+
 
 def compute_campaigns():
     """Correlation by attacker infrastructure fingerprint. Recomputed from the full
@@ -88,9 +114,11 @@ def compute_campaigns():
         })
     return campaigns
 
+
 @app.get("/campaigns")
 def get_campaigns():
     return compute_campaigns()
+
 
 @app.post("/campaigns/{campaign_id}/brief")
 def generate_brief(campaign_id: str):
@@ -125,23 +153,29 @@ Write a 3-4 sentence brief: what this actor cluster is doing across the affected
     write_json(BRIEF_FILE, briefs)
     return {"campaign_id": campaign_id, "intel_brief": text}
 
+
 # ---- FEATURE 3: Zero-Knowledge Chain-of-Custody (submission -> verdict) ----
 
 CUSTODY_FILE = "data/custody.json"
 CUSTODY_GENESIS = "0" * 64
 
+
 def custody_canonical(block):
     core = {k: v for k, v in block.items() if k != "block_hash"}
     return json.dumps(core, sort_keys=True, separators=(",", ":"))
 
+
 def custody_hash(prev_hash, index, core_json):
     return hashlib.sha256(f"{prev_hash}|{index}|{core_json}".encode()).hexdigest()
+
 
 def load_custody():
     return load_json(CUSTODY_FILE, [])
 
+
 def write_custody(items):
     write_json(CUSTODY_FILE, items)
+
 
 @app.post("/custody/submit")
 def submit_custody(payload: dict = Body(...)):
@@ -164,13 +198,15 @@ def submit_custody(payload: dict = Body(...)):
     write_custody(submissions)
     return {"submission_id": submission_id, "status": "pending"}
 
+
 @app.get("/custody/submissions")
-def get_custody_submissions():
-    """Full detail including raw blocks — Authority-only in the UI, never exposed via /custody/verdicts."""
+def get_custody_submissions(_=Depends(require_role("authority"))):
+    """Full detail including raw blocks — Authority-only, never exposed via /custody/verdicts."""
     return load_custody()
 
+
 @app.post("/custody/submissions/{submission_id}/analyze")
-def analyze_custody_submission(submission_id: str):
+def analyze_custody_submission(submission_id: str, _=Depends(require_role("authority"))):
     submissions = load_custody()
     sub = next((s for s in submissions if s["submission_id"] == submission_id), None)
     if sub is None:
@@ -194,6 +230,7 @@ def analyze_custody_submission(submission_id: str):
     write_custody(submissions)
     return {"submission_id": submission_id, "verdict": sub["verdict"]}
 
+
 @app.get("/custody/verdicts")
 def get_custody_verdicts():
     """Public, network-wide view — verdict only, never the underlying evidence blocks."""
@@ -209,6 +246,7 @@ def get_custody_verdicts():
         }
         for s in submissions
     ]
+
 
 @app.get("/reports/all")
 def get_all_reports():
