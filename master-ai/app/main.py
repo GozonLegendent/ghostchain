@@ -6,6 +6,7 @@ import json
 import os
 import hashlib
 import time
+import numpy as np
 
 from auth import create_token, require_role
 
@@ -69,7 +70,6 @@ def login(req: LoginRequest):
 
 @app.post("/reports")
 def receive_report(report: dict = Body(...)):
-    # PRIVACY GATE: refuse anything that isn't sanitized
     leaked = FORBIDDEN_FIELDS & set(report.keys())
     if leaked:
         raise HTTPException(status_code=400, detail=f"PRIVACY GATE: rejected non-sanitized fields {sorted(leaked)}")
@@ -87,7 +87,7 @@ def receive_report(report: dict = Body(...)):
 
 def compute_campaigns():
     """Correlation by attacker infrastructure fingerprint. Recomputed from the full
-    report set on every call — order-independent by construction."""
+    report set on every call -- order-independent by construction."""
     reports = load_json(DATA_FILE, [])
     groups = {}
     for r in reports:
@@ -130,10 +130,11 @@ def generate_brief(campaign_id: str):
         f'- {r["timestamp"]} | {r["source_org"]} | {r["attack_type"]} ({r["mitre_technique"]}) | {r["observed_behaviour"]}'
         for r in camp["reports"]
     )
+
     prompt = f"""You are a threat intelligence analyst writing a short global intelligence brief.
 
 Campaign: {camp["campaign_id"]}
-Threat actor label: {camp["threat_actor"]} (a self-assigned cluster label — do NOT reference any real-world threat group names)
+Threat actor label: {camp["threat_actor"]} (a self-assigned cluster label -- do NOT reference any real-world threat group names)
 Attacker infrastructure fingerprint: {camp["fingerprint"]["source_ip"]}
 Organizations affected: {", ".join(camp["orgs_affected"])}
 
@@ -144,8 +145,9 @@ Write a 3-4 sentence brief: what this actor cluster is doing across the affected
 
     response = requests.post(
         "http://host.docker.internal:11434/api/generate",
-        json={"model": "qwen2.5-coder:7b", "prompt": prompt, "stream": False}
+        json={"model": "qwen2.5-coder:7b", "prompt": prompt, "stream": False},
     )
+
     text = response.json().get("response", "Error generating brief")
 
     briefs = load_json(BRIEF_FILE, {})
@@ -201,7 +203,7 @@ def submit_custody(payload: dict = Body(...)):
 
 @app.get("/custody/submissions")
 def get_custody_submissions(_=Depends(require_role("authority"))):
-    """Full detail including raw blocks — Authority-only, never exposed via /custody/verdicts."""
+    """Full detail including raw blocks -- Authority-only, never exposed via /custody/verdicts."""
     return load_custody()
 
 
@@ -233,7 +235,7 @@ def analyze_custody_submission(submission_id: str, _=Depends(require_role("autho
 
 @app.get("/custody/verdicts")
 def get_custody_verdicts():
-    """Public, network-wide view — verdict only, never the underlying evidence blocks."""
+    """Public, network-wide view -- verdict only, never the underlying evidence blocks."""
     submissions = load_custody()
     return [
         {
@@ -250,7 +252,96 @@ def get_custody_verdicts():
 
 @app.get("/reports/all")
 def get_all_reports():
-    """Flat list of every sanitized report shared across the network — visible to
+    """Flat list of every sanitized report shared across the network -- visible to
     every org and Authority. Already privacy-filtered at ingest; never contains
     raw logs, payloads, or narratives."""
     return load_json(DATA_FILE, [])
+
+
+# ---- PHASE 5: Federated Learning ----
+
+FEDERATED_WEIGHTS_FILE = "data/federated_weights.json"
+GLOBAL_MODEL_FILE = "data/global_model.json"
+
+
+class OrgWeights(BaseModel):
+    org: str
+    trained: bool
+    sample_count: int
+    coef: list
+    intercept: list
+    classes: list
+
+
+@app.post("/federated/submit_weights")
+def submit_weights(weights: OrgWeights):
+    """
+    Receives ONLY a trained model's weights from an org -- never raw incident
+    data. Stores the latest submission per org, keyed by org id.
+    """
+    if not weights.trained:
+        return {"accepted": False, "reason": "org reported untrained model"}
+
+    all_weights = load_json(FEDERATED_WEIGHTS_FILE, {})
+    all_weights[weights.org] = weights.dict()
+    write_json(FEDERATED_WEIGHTS_FILE, all_weights)
+
+    return {"accepted": True, "org": weights.org, "total_orgs_submitted": len(all_weights)}
+
+
+@app.post("/federated/aggregate")
+def aggregate_weights():
+    """
+    Averages every org's submitted weights into one global model (FedAvg).
+    This is the actual federated learning step -- combining knowledge from
+    all orgs without any of them ever sharing raw data with each other.
+    """
+    all_weights = load_json(FEDERATED_WEIGHTS_FILE, {})
+    if len(all_weights) < 2:
+        return {"aggregated": False, "reason": "need at least 2 orgs to aggregate"}
+
+    submissions = list(all_weights.values())
+    reference_classes = submissions[0]["classes"]
+    for s in submissions:
+        if s["classes"] != reference_classes:
+            return {
+                "aggregated": False,
+                "reason": "orgs have mismatched class sets -- cannot average directly",
+            }
+
+    coefs = np.array([s["coef"] for s in submissions])
+    intercepts = np.array([s["intercept"] for s in submissions])
+
+    global_model = {
+        "coef": coefs.mean(axis=0).tolist(),
+        "intercept": intercepts.mean(axis=0).tolist(),
+        "classes": reference_classes,
+        "contributing_orgs": [s["org"] for s in submissions],
+        "total_samples_represented": sum(s["sample_count"] for s in submissions),
+    }
+
+    write_json(GLOBAL_MODEL_FILE, global_model)
+    return {"aggregated": True, **global_model}
+
+
+@app.get("/federated/global_model")
+def get_global_model():
+    """Returns the current aggregated global model, if one exists yet."""
+    model = load_json(GLOBAL_MODEL_FILE, None)
+    if model is None:
+        return {"exists": False}
+    return {"exists": True, **model}
+
+
+@app.get("/federated/status")
+def federated_status():
+    """Shows which orgs have submitted local model weights so far."""
+    all_weights = load_json(FEDERATED_WEIGHTS_FILE, {})
+    return {
+        "orgs_submitted": list(all_weights.keys()),
+        "count": len(all_weights),
+        "details": {
+            org: {"sample_count": w["sample_count"], "classes": w["classes"]}
+            for org, w in all_weights.items()
+        },
+    }

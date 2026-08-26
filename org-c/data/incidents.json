@@ -21,5 +21,350 @@
       "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
       "block_hash": "142afacdf9ba8eaa1afc95dd6feb44b56b0c4972721dadaf65d352ebc2b6ac9a"
     }
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T19:35:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "207.122.205.190"
+    },
+    "raw_log": {
+      "timestamp": "2026-08-26T19:35:30Z",
+      "source_ip": "207.122.205.190",
+      "endpoint": "/api/v1/admin",
+      "attack_type": "Credential Stuffing",
+      "request_payload": "username=user831&password=****",
+      "response_code": 401
+    },
+    "ai_narrative": "A credential stuffing attack targeting the `/api/v1/admin` endpoint was detected on 2026-08-26T19:35:30Z from IP address 207.122.205.190. The attempt used a payload containing username `user831` and a masked password, resulting in a 401 Unauthorized response.",
+    "evidence": {
+      "block_index": 1,
+      "prev_hash": "142afacdf9ba8eaa1afc95dd6feb44b56b0c4972721dadaf65d352ebc2b6ac9a",
+      "block_hash": "ca89ae737a7d4cda8bdabdabc806a47af8728b24f37741b187818caaccf1df0e"
+    }
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T19:42:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "92.14.14.203"
+    },
+    "raw_log": {
+      "timestamp": "2026-08-26T19:42:30Z",
+      "source_ip": "92.14.14.203",
+      "endpoint": "/api/v1/checkout",
+      "attack_type": "Credential Stuffing",
+      "request_payload": "username=user531&password=****",
+      "response_code": 401
+    },
+    "ai_narrative": "At 7:42 PM UTC on August 26, 2026, an attack targeting the `/api/v1/checkout` endpoint was attempted using credential stuffing. The source IP address was 92.14.14.203, and the payload included a username `user531` with what appears to be a default or guessed password. The server responded with a 401 Unauthorized status code.",
+    "evidence": {
+      "block_index": 2,
+      "prev_hash": "ca89ae737a7d4cda8bdabdabc806a47af8728b24f37741b187818caaccf1df0e",
+      "block_hash": "42ace1f6f0ad21d1e0282a404aebd27a755e81073dde837065001e06a94691a3"
+    }
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T19:49:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "178.176.228.207"
+    },
+    "raw_log": {
+      "timestamp": "2026-08-26T19:49:30Z",
+      "source_ip": "178.176.228.207",
+      "endpoint": "/api/v1/profile",
+      "attack_type": "SQL Injection",
+      "request_payload": "1; DROP TABLE users;--",
+      "response_code": 500
+    },
+    "ai_narrative": "A malicious actor from IP address 178.176.228.207 attempted to exploit an SQL injection vulnerability on your system by targeting the /api/v1/profile endpoint with a payload designed to drop the users table. The attack resulted in a server error (response code 500).",
+    "evidence": {
+      "block_index": 3,
+      "prev_hash": "42ace1f6f0ad21d1e0282a404aebd27a755e81073dde837065001e06a94691a3",
+      "block_hash": "24935d7061f6190739728cd426fb52a510b865f556d23ff2bb2b6105c7d64d65"
+    }
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T19:56:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "27.116.240.51"
+    },
+    "raw_log": {
+      "timestamp": "2026-08-26T19:56:30Z",
+      "source_ip": "27.116.240.51",
+      "endpoint": "/api/v1/search",
+      "attack_type": "SQL Injection",
+      "request_payload": "' OR '1'='1",
+      "response_code": 500
+    },
+    "ai_narrative": "A SQL injection attack targeting the `/api/v1/search` endpoint was detected at 2026-08-26T19:56:30Z from source IP 27.116.240.51. The payload `'; OR '1'='1` led to a server error with a response code of 500.",
+    "evidence": {
+      "block_index": 4,
+      "prev_hash": "24935d7061f6190739728cd426fb52a510b865f556d23ff2bb2b6105c7d64d65",
+      "block_hash": "4cba44eb81c9191fc96222a750fed41b71b9e04847fe3d0f02f8e4d4cb63f711"
+    }
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T20:03:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "157.0.245.233"
+    },
+    "raw_log": {
+      "timestamp": "2026-08-26T20:03:30Z",
+      "source_ip": "157.0.245.233",
+      "endpoint": "/api/v1/checkout",
+      "attack_type": "SQL Injection",
+      "request_payload": "1; DROP TABLE users;--",
+      "response_code": 403
+    },
+    "ai_narrative": "At 8:03 PM UTC on August 26, a SQL injection attack targeting the `/api/v1/checkout` endpoint was executed from IP address `157.0.245.233`. The attack resulted in an HTTP 403 Forbidden response, indicating that the malicious payload attempting to drop the `users` table was unsuccessful.",
+    "evidence": {
+      "block_index": 5,
+      "prev_hash": "4cba44eb81c9191fc96222a750fed41b71b9e04847fe3d0f02f8e4d4cb63f711",
+      "block_hash": "6722508d180898e53837eba621d5d1829eaded2782d17eb93602161074f4fc54"
+    }
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T20:10:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "100.102.244.228"
+    },
+    "raw_log": {
+      "timestamp": "2026-08-26T20:10:30Z",
+      "source_ip": "100.102.244.228",
+      "endpoint": "/api/v1/login",
+      "attack_type": "SQL Injection",
+      "request_payload": "' UNION SELECT * FROM accounts--",
+      "response_code": 500
+    },
+    "ai_narrative": "A SQL injection attack targeting the `/api/v1/login` endpoint at 20:10:30Z resulted in a response code of 500. The attack originated from IP address 100.102.244.228 and used the payload `' UNION SELECT * FROM accounts--`.",
+    "evidence": {
+      "block_index": 6,
+      "prev_hash": "6722508d180898e53837eba621d5d1829eaded2782d17eb93602161074f4fc54",
+      "block_hash": "2523e78e009c02831ec57836cfecfc1a05488b55763d69354b0474417b30660f"
+    }
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T20:17:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "86.44.202.119"
+    },
+    "raw_log": {
+      "timestamp": "2026-08-26T20:17:30Z",
+      "source_ip": "86.44.202.119",
+      "endpoint": "/api/v1/profile",
+      "attack_type": "Credential Stuffing",
+      "request_payload": "username=user809&password=****",
+      "response_code": 403
+    },
+    "ai_narrative": "On August 26, 2026 at 20:17 UTC, an attacker from IP address 86.44.202.119 attempted to perform a Credential Stuffing attack on the /api/v1/profile endpoint with username \"user809\" and an unknown password. The attempt resulted in a response code of 403, indicating that the credentials were rejected.",
+    "evidence": {
+      "block_index": 7,
+      "prev_hash": "2523e78e009c02831ec57836cfecfc1a05488b55763d69354b0474417b30660f",
+      "block_hash": "f3e08bc07a5511f660385fd631918e2b1267830cc23bcb60174edca506bf2e9c"
+    }
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T20:24:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "44.65.14.39"
+    },
+    "raw_log": {
+      "timestamp": "2026-08-26T20:24:30Z",
+      "source_ip": "44.65.14.39",
+      "endpoint": "/api/v1/login",
+      "attack_type": "SQL Injection",
+      "request_payload": "' UNION SELECT * FROM accounts--",
+      "response_code": 500
+    },
+    "ai_narrative": "At 2026-08-26T20:24:30Z, a SQL injection attack targeting the /api/v1/login endpoint was executed from IP address 44.65.14.39. The payload used attempted to retrieve all data from the accounts table and resulted in a server response code of 500.",
+    "evidence": {
+      "block_index": 8,
+      "prev_hash": "f3e08bc07a5511f660385fd631918e2b1267830cc23bcb60174edca506bf2e9c",
+      "block_hash": "6157f6602d91e8fdc3d8fd5b04be23b0ceb2f6ba36800fd69adf04024310c151"
+    }
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T20:31:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "122.179.79.141"
+    },
+    "raw_log": {
+      "timestamp": "2026-08-26T20:31:30Z",
+      "source_ip": "122.179.79.141",
+      "endpoint": "/api/v1/checkout",
+      "attack_type": "SQL Injection",
+      "request_payload": "' UNION SELECT * FROM accounts--",
+      "response_code": 403
+    },
+    "ai_narrative": "A SQL injection attack targeting the `/api/v1/checkout` endpoint was detected on 2026-08-26T20:31:30Z from source IP 122.179.79.141, with a payload `' UNION SELECT * FROM accounts--`. The attack resulted in a 403 Forbidden response.",
+    "evidence": {
+      "block_index": 9,
+      "prev_hash": "6157f6602d91e8fdc3d8fd5b04be23b0ceb2f6ba36800fd69adf04024310c151",
+      "block_hash": "534d4bc5095e24614d3bd14acb291902ba529e96f400c28d06057fe644c8fa28"
+    }
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T20:38:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "167.52.71.112"
+    },
+    "raw_log": {
+      "timestamp": "2026-08-26T20:38:30Z",
+      "source_ip": "167.52.71.112",
+      "endpoint": "/api/v1/login",
+      "attack_type": "Credential Stuffing",
+      "request_payload": "username=user15&password=****",
+      "response_code": 403
+    },
+    "ai_narrative": "A credential stuffing attack targeting the `/api/v1/login` endpoint was detected at 20:38:30Z on 2026-08-26 from IP address 167.52.71.112. The payload `username=user15&password=****` resulted in a 403 Forbidden response.",
+    "evidence": {
+      "block_index": 10,
+      "prev_hash": "534d4bc5095e24614d3bd14acb291902ba529e96f400c28d06057fe644c8fa28",
+      "block_hash": "a0df8d768f2d4f83b74c690d0ce91e014e893999063c8eb1e25e4b314a29ffad"
+    }
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T20:45:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "55.149.123.196"
+    },
+    "raw_log": {
+      "timestamp": "2026-08-26T20:45:30Z",
+      "source_ip": "55.149.123.196",
+      "endpoint": "/api/v1/checkout",
+      "attack_type": "Credential Stuffing",
+      "request_payload": "username=user29&password=****",
+      "response_code": 401
+    },
+    "ai_narrative": "A credential stuffing attack targeting the `/api/v1/checkout` endpoint was detected at 20:45:30Z on August 26, 2026. The source IP address is 55.149.123.196. The attack attempted to log in with username \"user29\" and an unknown password, resulting in a 401 Unauthorized response.",
+    "evidence": {
+      "block_index": 11,
+      "prev_hash": "a0df8d768f2d4f83b74c690d0ce91e014e893999063c8eb1e25e4b314a29ffad",
+      "block_hash": "f955a46d8ef88f39cfe8e05ecb2958f4230da01e113e10f20734ff509dc2edff"
+    }
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T20:52:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "214.67.31.233"
+    },
+    "raw_log": {
+      "timestamp": "2026-08-26T20:52:30Z",
+      "source_ip": "214.67.31.233",
+      "endpoint": "/api/v1/search",
+      "attack_type": "SQL Injection",
+      "request_payload": "' UNION SELECT * FROM accounts--",
+      "response_code": 400
+    },
+    "ai_narrative": "At 2026-08-26T20:52:30Z, an SQL injection attack was detected targeting the `/api/v1/search` endpoint from source IP 214.67.31.233. The payload `' UNION SELECT * FROM accounts--` resulted in a response code of 400.",
+    "evidence": {
+      "block_index": 12,
+      "prev_hash": "f955a46d8ef88f39cfe8e05ecb2958f4230da01e113e10f20734ff509dc2edff",
+      "block_hash": "64cd4e3f05ee5ebface33bbf6e77aee5fb11a161359ece5b87cbdf118143872f"
+    }
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T20:59:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "209.215.66.137"
+    },
+    "raw_log": {
+      "timestamp": "2026-08-26T20:59:30Z",
+      "source_ip": "209.215.66.137",
+      "endpoint": "/api/v1/profile",
+      "attack_type": "SQL Injection",
+      "request_payload": "' UNION SELECT * FROM accounts--",
+      "response_code": 403
+    },
+    "ai_narrative": "At 20:59:30 UTC on August 26, an SQL injection attack targeting the `/api/v1/profile` endpoint was detected from IP address 209.215.66.137. The payload `'; UNION SELECT * FROM accounts--` resulted in a response code of 403.",
+    "evidence": {
+      "block_index": 13,
+      "prev_hash": "64cd4e3f05ee5ebface33bbf6e77aee5fb11a161359ece5b87cbdf118143872f",
+      "block_hash": "502161851b6225f4aac82da66a7b6f1bf710411354642ae448a9a8dcc0b5aae2"
+    }
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T21:06:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "113.93.2.199"
+    },
+    "raw_log": {
+      "timestamp": "2026-08-26T21:06:30Z",
+      "source_ip": "113.93.2.199",
+      "endpoint": "/api/v1/admin",
+      "attack_type": "Credential Stuffing",
+      "request_payload": "username=user523&password=****",
+      "response_code": 401
+    },
+    "ai_narrative": "At 21:06:30 on August 26, 2026, an attacker from IP address 113.93.2.199 attempted to perform a Credential Stuffing attack on the /api/v1/admin endpoint using credentials for user523. The attempt resulted in a 401 Unauthorized response.",
+    "evidence": {
+      "block_index": 14,
+      "prev_hash": "502161851b6225f4aac82da66a7b6f1bf710411354642ae448a9a8dcc0b5aae2",
+      "block_hash": "c51821f02cbb866e81a524f3ad2062b2a88106b3532d8520232f5bc2ef5680b7"
+    }
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T21:13:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "159.61.31.84"
+    },
+    "raw_log": {
+      "timestamp": "2026-08-26T21:13:30Z",
+      "source_ip": "159.61.31.84",
+      "endpoint": "/api/v1/checkout",
+      "attack_type": "Credential Stuffing",
+      "request_payload": "username=user145&password=****",
+      "response_code": 401
+    },
+    "ai_narrative": "On August 26, 2026 at 21:13 UTC, a credential stuffing attack targeting the `/api/v1/checkout` endpoint was attempted from IP address `159.61.31.84`. The attack used credentials `user145` and `****`, resulting in a `401 Unauthorized` response.",
+    "evidence": {
+      "block_index": 15,
+      "prev_hash": "c51821f02cbb866e81a524f3ad2062b2a88106b3532d8520232f5bc2ef5680b7",
+      "block_hash": "e1eb99d849f7eb34a1a29bb49fd3449f00eb234b46b251d805f605907da124cc"
+    }
   }
 ]

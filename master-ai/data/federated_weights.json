@@ -1,0 +1,59 @@
+{
+  "org_a": {
+    "org": "org_a",
+    "trained": true,
+    "sample_count": 17,
+    "coef": [
+      [
+        0.597997750372039,
+        0.057060041055165385,
+        -0.2844478690484485
+      ]
+    ],
+    "intercept": [
+      -17.085316653360714
+    ],
+    "classes": [
+      "Credential Stuffing",
+      "SQL Injection"
+    ]
+  },
+  "org_b": {
+    "org": "org_b",
+    "trained": true,
+    "sample_count": 17,
+    "coef": [
+      [
+        0.8796193054726733,
+        0.07825754762781786,
+        -0.04658610781417523
+      ]
+    ],
+    "intercept": [
+      -31.549805157787922
+    ],
+    "classes": [
+      "Credential Stuffing",
+      "SQL Injection"
+    ]
+  },
+  "org_c": {
+    "org": "org_c",
+    "trained": true,
+    "sample_count": 16,
+    "coef": [
+      [
+        -0.0317280050485779,
+        0.49808197300658286,
+        0.0839494846403153
+      ]
+    ],
+    "intercept": [
+      -203.23481531821656
+    ],
+    "classes": [
+      "Credential Stuffing",
+      "SQL Injection"
+    ]
+  }
+}

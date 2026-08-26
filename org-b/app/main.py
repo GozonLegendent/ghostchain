@@ -6,6 +6,8 @@ import json
 import os
 import re
 import hashlib
+import numpy as np
+from sklearn.linear_model import LogisticRegression
 
 from auth import create_token, require_role
 from shared.merkle import MerkleTree, leaf_hash
@@ -93,7 +95,6 @@ ACCOUNT_RE = re.compile(r"(user(name)?|acct|account|password|token)[=:]\S+", re.
 
 
 def scrub(text):
-    """Regex PII scrubber: removes emails and account-style tokens from free text."""
     text = EMAIL_RE.sub("[REDACTED_EMAIL]", text)
     text = ACCOUNT_RE.sub("[REDACTED_CREDENTIAL]", text)
     return text
@@ -123,7 +124,6 @@ DEFAULT_KNOWLEDGE = {
 
 
 def sanitize_report(incident):
-    """Whitelist projection -- raw_log, payloads and narratives NEVER leave the org."""
     k = ATTACK_KNOWLEDGE.get(incident["attack_type"], DEFAULT_KNOWLEDGE)
     endpoint = incident.get("raw_log", {}).get("endpoint", "unknown endpoint")
     return {
@@ -166,7 +166,7 @@ class LoginRequest(BaseModel):
 
 
 class ProofRequest(BaseModel):
-    leaf_hash: str  # client sends SHA256(identifier), never the raw identifier
+    leaf_hash: str
 
 
 MITRE_MAP = {
@@ -234,13 +234,11 @@ def get_incidents(_=Depends(require_role(ORG_ID))):
 
 @app.get("/sanitized")
 def get_sanitized():
-    """What this org actually shares -- for the privacy before/after demo."""
     return [sanitize_report(i) for i in load_incidents()]
 
 
 @app.post("/sync_reports")
 def sync_reports():
-    """Backfill: push sanitized reports for all stored incidents to master-ai."""
     incidents = load_incidents()
     sent = sum(1 for i in incidents if submit_to_master(sanitize_report(i)))
     return {"org": ORG_ID, "reports_sent": sent, "total_incidents": len(incidents)}
@@ -280,8 +278,6 @@ def verify_chain():
 
 @app.get("/lookup")
 def lookup_identifier(identifier: str):
-    """Legacy plaintext lookup -- kept for backward compatibility, unused by
-    the frontend now that /commit + /prove provide a cryptographic path."""
     incidents = load_incidents()
     identifier_lower = identifier.strip().lower()
     matches = []
@@ -300,7 +296,6 @@ def lookup_identifier(identifier: str):
 # ---- PHASE 4: Merkle non-membership commitments ----
 
 def build_org_tree():
-    """Leaves = hash(source_ip) for every incident this org has ever logged."""
     incidents = load_incidents()
     ips = [i["raw_log"]["source_ip"] for i in incidents if i.get("raw_log", {}).get("source_ip")]
     leaves = [leaf_hash(ip) for ip in ips]
@@ -309,18 +304,12 @@ def build_org_tree():
 
 @app.get("/commit")
 def get_commitment():
-    """Publish only the Merkle root -- never the underlying identifier list."""
     tree = build_org_tree()
     return {"org": ORG_ID, "root": tree.root, "leaf_count": len(set(tree.leaves))}
 
 
 @app.post("/prove")
 def get_proof(req: ProofRequest):
-    """
-    Client sends a hashed identifier. We return sibling hashes only --
-    never a plaintext exposed/not-exposed verdict. The browser verifies
-    the proof itself against the previously published root.
-    """
     tree = build_org_tree()
     found, path = tree.proof_for(req.leaf_hash)
     return {
@@ -330,3 +319,59 @@ def get_proof(req: ProofRequest):
         "present": found,
         "path": path,
     }
+
+
+# ---- PHASE 5: Federated Learning ----
+
+ENDPOINT_MAP = {
+    "/api/v1/login": 0,
+    "/api/v1/checkout": 1,
+    "/api/v1/search": 2,
+    "/api/v1/profile": 3,
+    "/api/v1/admin": 4,
+}
+
+
+def featurize(incident):
+    raw = incident.get("raw_log", {})
+    ep = ENDPOINT_MAP.get(raw.get("endpoint"), 5)
+    code = raw.get("response_code", 0)
+    payload_len = len(str(raw.get("request_payload", "")))
+    return [ep, code, payload_len]
+
+
+@app.post("/train_local_model")
+def train_local_model():
+    """
+    Trains a small logistic regression classifier on THIS org's own incidents
+    (attack_type prediction from request features). Returns and submits only
+    the trained weights -- never the underlying incident data.
+    """
+    incidents = load_incidents()
+    if len(incidents) < 2:
+        return {"org": ORG_ID, "trained": False, "reason": "not enough incidents"}
+
+    X = np.array([featurize(i) for i in incidents])
+    y = np.array([i["attack_type"] for i in incidents])
+
+    if len(set(y)) < 2:
+        return {"org": ORG_ID, "trained": False, "reason": "only one class present, cannot train classifier"}
+
+    clf = LogisticRegression(max_iter=1000)
+    clf.fit(X, y)
+
+    weights = {
+        "org": ORG_ID,
+        "trained": True,
+        "sample_count": len(incidents),
+        "coef": clf.coef_.tolist(),
+        "intercept": clf.intercept_.tolist(),
+        "classes": clf.classes_.tolist(),
+    }
+
+    try:
+        requests.post(f"{MASTER_URL}/federated/submit_weights", json=weights, timeout=10)
+    except requests.RequestException:
+        pass
+
+    return weights

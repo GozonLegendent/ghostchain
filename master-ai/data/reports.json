@@ -83,5 +83,770 @@
     "observed_behaviour": "automated credential stuffing using breached credential lists",
     "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
     "confidence": 0.9
+  },
+  {
+    "source_org": "org_a",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T19:35:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "13.37.48.94",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/checkout"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_a",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T19:42:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "23.222.214.18",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/admin"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_a",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T19:49:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "16.63.114.162",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/login"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_a",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T19:56:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "13.113.23.143",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/admin"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_a",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T20:03:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "139.60.157.144",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/search"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_a",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T20:10:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "164.96.190.25",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/login"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_a",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T20:17:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "53.254.218.199",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/admin"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_a",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T20:24:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "93.153.127.204",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/profile"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_a",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T20:31:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "77.253.175.187",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/checkout"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_a",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T20:38:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "31.214.84.194",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/search"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_a",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T20:45:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "11.39.160.88",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/checkout"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_a",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T20:52:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "205.233.35.216",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/admin"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_a",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T20:59:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "171.33.31.188",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/search"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_a",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T21:06:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "73.197.177.6",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/admin"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_a",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T21:13:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "30.252.30.56",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/search"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_b",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T19:35:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "102.200.254.21",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/checkout"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_b",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T19:42:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "72.70.220.222",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/profile"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_b",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T19:49:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "98.118.77.22",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/profile"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_b",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T19:56:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "60.6.248.213",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/checkout"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_b",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T20:03:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "38.214.189.157",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/search"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_b",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T20:10:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "159.27.233.231",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/checkout"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_b",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T20:17:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "27.246.205.16",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/profile"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_b",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T20:24:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "42.56.174.154",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/login"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_b",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T20:31:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "39.51.186.158",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/login"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_b",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T20:38:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "158.192.76.163",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/login"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_b",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T20:45:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "122.62.59.218",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/search"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_b",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T20:52:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "80.43.73.27",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/profile"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_b",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T20:59:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "42.11.105.244",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/search"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_b",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T21:06:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "7.152.46.179",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/checkout"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_b",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T21:13:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "92.114.168.163",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/admin"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T19:35:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "207.122.205.190",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/admin"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T19:42:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "92.14.14.203",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/checkout"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T19:49:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "178.176.228.207",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/profile"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T19:56:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "27.116.240.51",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/search"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T20:03:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "157.0.245.233",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/checkout"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T20:10:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "100.102.244.228",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/login"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T20:17:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "86.44.202.119",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/profile"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T20:24:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "44.65.14.39",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/login"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T20:31:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "122.179.79.141",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/checkout"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T20:38:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "167.52.71.112",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/login"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T20:45:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "55.149.123.196",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/checkout"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T20:52:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "214.67.31.233",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/search"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "SQL Injection",
+    "mitre_technique": "T1190",
+    "timestamp": "2026-08-26T20:59:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "209.215.66.137",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "repeated malformed SQL queries on /api/v1/profile"
+    ],
+    "observed_behaviour": "SQL injection probing for data access or privilege escalation",
+    "recommended_detection_rule": "monitor repeated malformed SQL queries on API endpoints",
+    "confidence": 0.85
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T21:06:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "113.93.2.199",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/admin"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
+  },
+  {
+    "source_org": "org_c",
+    "attack_type": "Credential Stuffing",
+    "mitre_technique": "T1110.004",
+    "timestamp": "2026-08-26T21:13:30Z",
+    "attacker_infrastructure": {
+      "source_ip": "159.61.31.84",
+      "asn_or_host": "unknown/demo",
+      "approx_geolocation": "unknown/demo"
+    },
+    "indicators_of_compromise": [
+      "high-volume failed logins from a single source IP on /api/v1/checkout"
+    ],
+    "observed_behaviour": "automated credential stuffing using breached credential lists",
+    "recommended_detection_rule": "alert when failed logins from one source IP exceed 10/minute on authentication endpoints",
+    "confidence": 0.9
   }
 ]
