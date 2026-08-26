@@ -8,6 +8,7 @@ import re
 import hashlib
 
 from auth import create_token, require_role
+from shared.merkle import MerkleTree, leaf_hash
 
 ORG_ID = "org_c"
 GENESIS = "0" * 64
@@ -15,6 +16,7 @@ MASTER_URL = "http://master-ai:8000"
 
 ORG_USERNAME = os.environ.get("ORG_USERNAME", "org_c")
 ORG_PASSWORD = os.environ.get("ORG_PASSWORD", "changeme_c")
+
 app = FastAPI()
 
 app.add_middleware(
@@ -111,6 +113,7 @@ ATTACK_KNOWLEDGE = {
         "confidence": 0.85,
     },
 }
+
 DEFAULT_KNOWLEDGE = {
     "iocs": ["anomalous request patterns on {endpoint}"],
     "behaviour": "unclassified suspicious activity",
@@ -120,7 +123,7 @@ DEFAULT_KNOWLEDGE = {
 
 
 def sanitize_report(incident):
-    """Whitelist projection — raw_log, payloads and narratives NEVER leave the org."""
+    """Whitelist projection -- raw_log, payloads and narratives NEVER leave the org."""
     k = ATTACK_KNOWLEDGE.get(incident["attack_type"], DEFAULT_KNOWLEDGE)
     endpoint = incident.get("raw_log", {}).get("endpoint", "unknown endpoint")
     return {
@@ -162,9 +165,13 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class ProofRequest(BaseModel):
+    leaf_hash: str  # client sends SHA256(identifier), never the raw identifier
+
+
 MITRE_MAP = {
     "Credential Stuffing": "T1110.004",
-    "SQL Injection": "T1190"
+    "SQL Injection": "T1190",
 }
 
 
@@ -198,8 +205,9 @@ Write only the summary, nothing else."""
 
     response = requests.post(
         "http://host.docker.internal:11434/api/generate",
-        json={"model": "qwen2.5-coder:7b", "prompt": prompt, "stream": False}
+        json={"model": "qwen2.5-coder:7b", "prompt": prompt, "stream": False},
     )
+
     narrative = response.json().get("response", "Error generating narrative")
 
     incident = {
@@ -208,10 +216,10 @@ Write only the summary, nothing else."""
         "mitre_technique": technique_id,
         "timestamp": log.timestamp,
         "attacker_infrastructure": {
-            "source_ip": log.source_ip
+            "source_ip": log.source_ip,
         },
         "raw_log": log.dict(),
-        "ai_narrative": narrative
+        "ai_narrative": narrative,
     }
 
     save_incident(incident)
@@ -226,7 +234,7 @@ def get_incidents(_=Depends(require_role(ORG_ID))):
 
 @app.get("/sanitized")
 def get_sanitized():
-    """What this org actually shares — for the privacy before/after demo."""
+    """What this org actually shares -- for the privacy before/after demo."""
     return [sanitize_report(i) for i in load_incidents()]
 
 
@@ -272,6 +280,8 @@ def verify_chain():
 
 @app.get("/lookup")
 def lookup_identifier(identifier: str):
+    """Legacy plaintext lookup -- kept for backward compatibility, unused by
+    the frontend now that /commit + /prove provide a cryptographic path."""
     incidents = load_incidents()
     identifier_lower = identifier.strip().lower()
     matches = []
@@ -285,3 +295,38 @@ def lookup_identifier(identifier: str):
                 "endpoint": inc.get("raw_log", {}).get("endpoint", "unknown"),
             })
     return {"org": ORG_ID, "exposed": len(matches) > 0, "matches": matches}
+
+
+# ---- PHASE 4: Merkle non-membership commitments ----
+
+def build_org_tree():
+    """Leaves = hash(source_ip) for every incident this org has ever logged."""
+    incidents = load_incidents()
+    ips = [i["raw_log"]["source_ip"] for i in incidents if i.get("raw_log", {}).get("source_ip")]
+    leaves = [leaf_hash(ip) for ip in ips]
+    return MerkleTree(leaves)
+
+
+@app.get("/commit")
+def get_commitment():
+    """Publish only the Merkle root -- never the underlying identifier list."""
+    tree = build_org_tree()
+    return {"org": ORG_ID, "root": tree.root, "leaf_count": len(set(tree.leaves))}
+
+
+@app.post("/prove")
+def get_proof(req: ProofRequest):
+    """
+    Client sends a hashed identifier. We return sibling hashes only --
+    never a plaintext exposed/not-exposed verdict. The browser verifies
+    the proof itself against the previously published root.
+    """
+    tree = build_org_tree()
+    found, path = tree.proof_for(req.leaf_hash)
+    return {
+        "org": ORG_ID,
+        "root": tree.root,
+        "leaf_hash": req.leaf_hash,
+        "present": found,
+        "path": path,
+    }

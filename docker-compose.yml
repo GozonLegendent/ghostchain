@@ -1,6 +1,8 @@
 services:
   org-a:
-    build: ./org-a
+    build:
+      context: .
+      dockerfile: org-a/Dockerfile
     ports:
       - "8001:8000"
     volumes:
@@ -10,8 +12,11 @@ services:
       - ORG_PASSWORD=YourRealPassword1
       - JWT_SECRET=YourSharedSecretHere
 
+
   org-b:
-    build: ./org-b
+    build:
+      context: .
+      dockerfile: org-b/Dockerfile
     ports:
       - "8002:8000"
     volumes:
@@ -21,8 +26,11 @@ services:
       - ORG_PASSWORD=YourRealPassword2
       - JWT_SECRET=YourSharedSecretHere
 
+
   org-c:
-    build: ./org-c
+    build:
+      context: .
+      dockerfile: org-c/Dockerfile
     ports:
       - "8004:8000"
     volumes:
@@ -31,6 +39,7 @@ services:
       - ORG_USERNAME=org_c
       - ORG_PASSWORD=YourRealPassword3
       - JWT_SECRET=YourSharedSecretHere
+
 
   master-ai:
     build: ./master-ai

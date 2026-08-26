@@ -1,5 +1,7 @@
-import { Activity, ShieldCheck, ShieldAlert, Radar } from "lucide-react";
-import { useCustodySubmissions } from "../api";
+import { useState } from "react";
+import { Activity, ShieldCheck, ShieldAlert, Radar, Loader2 } from "lucide-react";
+import { useVerdicts, analyzeCustodySubmission } from "../api";
+import { useAuth } from "../auth";
 import Page from "../components/Page";
 import HudPanel from "../components/HudPanel";
 import CountUp from "../components/CountUp";
@@ -19,20 +21,42 @@ function Stat({ icon: Icon, label, value, hint }) {
 }
 
 export default function NetworkAnalysis() {
-  const { submissions, loading } = useCustodySubmissions();
+  // /custody/verdicts is public and network-wide — every role sees the same
+  // verified/tampered/pending picture. The raw evidence-block endpoint
+  // (/custody/submissions) is Authority-only and was the previous data
+  // source here, which is why this page rendered empty for org logins.
+  const { verdicts, loading, refresh } = useVerdicts();
+  const { role } = useAuth();
+  const isAuthority = role === "authority";
+  const [analyzing, setAnalyzing] = useState(null);
+  const [error, setError] = useState(null);
 
-  const total = submissions.length;
-  const verified = submissions.filter((s) => s.verdict === "VERIFIED").length;
-  const tampered = submissions.filter((s) => s.verdict === "TAMPERED").length;
-  const pending = submissions.filter((s) => s.status === "pending").length;
+  const total = verdicts.length;
+  const verified = verdicts.filter((s) => s.verdict === "VERIFIED").length;
+  const tampered = verdicts.filter((s) => s.verdict === "TAMPERED").length;
+  const pending = verdicts.filter((s) => s.status === "pending").length;
 
-  const byOrg = submissions.reduce((acc, s) => {
-    acc[s.org_id] = acc[s.org_id] || { total: 0, verified: 0, tampered: 0 };
+  const byOrg = verdicts.reduce((acc, s) => {
+    acc[s.org_id] = acc[s.org_id] || { total: 0, verified: 0, tampered: 0, pending: 0 };
     acc[s.org_id].total += 1;
     if (s.verdict === "VERIFIED") acc[s.org_id].verified += 1;
     if (s.verdict === "TAMPERED") acc[s.org_id].tampered += 1;
+    if (s.status === "pending") acc[s.org_id].pending += 1;
     return acc;
   }, {});
+
+  async function handleAnalyze(submissionId) {
+    setAnalyzing(submissionId);
+    setError(null);
+    try {
+      await analyzeCustodySubmission(submissionId);
+      await refresh();
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setAnalyzing(null);
+    }
+  }
 
   return (
     <Page className="space-y-4 p-4">
@@ -68,12 +92,57 @@ export default function NetworkAnalysis() {
                   <span>{stats.total} submitted</span>
                   <span className="text-emerald-400">{stats.verified} verified</span>
                   <span className="text-rose-400">{stats.tampered} tampered</span>
+                  {stats.pending > 0 ? (
+                    <span className="text-amber-400">{stats.pending} pending</span>
+                  ) : null}
                 </div>
               </div>
             ))}
           </div>
         )}
       </HudPanel>
+
+      {isAuthority ? (
+        <HudPanel title="// AUTHORITY CONSOLE — PENDING REVIEW" icon={ShieldCheck}>
+          {error ? (
+            <p className="p-3 font-mono text-[11px] text-rose-400">// {error}</p>
+          ) : null}
+          {verdicts.filter((s) => s.status === "pending").length === 0 ? (
+            <div className="p-6 text-center font-mono text-xs text-slate-500">
+              // no pending submissions awaiting review
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-800">
+              {verdicts
+                .filter((s) => s.status === "pending")
+                .map((s) => (
+                  <div key={s.submission_id} className="flex items-center justify-between p-4">
+                    <div>
+                      <p className="font-mono text-sm text-cyan-200">{s.submission_id}</p>
+                      <p className="mt-0.5 font-mono text-[10px] text-slate-500">
+                        {s.org_id?.toUpperCase()} · submitted {s.submitted_at}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => handleAnalyze(s.submission_id)}
+                      disabled={analyzing === s.submission_id}
+                      className="cut-corner font-display flex items-center gap-2 bg-cyan-500 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-black transition-colors hover:bg-cyan-400 disabled:opacity-40"
+                    >
+                      {analyzing === s.submission_id ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : null}
+                      Analyze
+                    </button>
+                  </div>
+                ))}
+            </div>
+          )}
+        </HudPanel>
+      ) : (
+        <p className="text-center font-mono text-[10px] text-slate-600">
+          // full evidence-block review is restricted to the Authority role — this view shows verdicts only
+        </p>
+      )}
     </Page>
   );
 }

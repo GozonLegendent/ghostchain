@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { checkExposureAgainstOrg } from "./merkleAudit";
 
 export const ORGS = [
   { id: "org_a", name: "Org A", url: "http://localhost:8001" },
@@ -244,15 +245,32 @@ export function useVerdicts(pollMs = 5000) {
 }
 
 // ---- Personal Right-to-Audit lookup — public, no login required ----
+// PHASE 4: cryptographic non-membership check via Merkle commitments.
+// The identifier is hashed client-side and never sent in plaintext.
+// Each org only ever returns a root + sibling-hash proof; this browser
+// verifies the proof itself and decides exposed/not-exposed locally.
+
+
 
 export async function lookupIdentifier(identifier) {
   const settled = await Promise.allSettled(
-    ORGS.map((o) =>
-      fetch(`${o.url}/lookup?identifier=${encodeURIComponent(identifier)}`).then((r) => r.json())
-    )
+    ORGS.map((o) => checkExposureAgainstOrg(o.url, identifier))
   );
-  return ORGS.map((o, i) => ({
-    org: o,
-    data: settled[i].status === "fulfilled" ? settled[i].value : null,
-  }));
+
+  return ORGS.map((o, i) => {
+    if (settled[i].status !== "fulfilled" || !settled[i].value.reachable) {
+      return { org: o, data: null };
+    }
+    const { exposed, root, leaf } = settled[i].value;
+    return {
+      org: o,
+      data: {
+        org: o.id,
+        exposed,
+        merkle_root: root,
+        leaf_hash: leaf,
+        matches: [], // no incident detail is ever returned -- proof-only, by design
+      },
+    };
+  });
 }
