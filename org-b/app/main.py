@@ -143,13 +143,26 @@ def sanitize_report(incident):
     }
 
 
-def submit_to_master(report):
+def submit_for_custody(incident):
+    """
+    Bundles the evidence hash-chain block for THIS incident with the FULL RAW
+    incident and submits both to master-ai's custody queue. The raw incident
+    -- not a sanitized version -- travels here. Sanitization now happens on
+    master-ai's side, inside the AI Forensic Narrator, only after approval.
+    """
+    block = incident["evidence"]
+    payload = {
+        "org_id": ORG_ID,
+        "blocks": [block],
+        "raw_incident": incident,
+    }
     try:
-        r = requests.post(f"{MASTER_URL}/reports", json=report, timeout=5)
-        return r.status_code == 200
+        r = requests.post(f"{MASTER_URL}/custody/submit", json=payload, timeout=5)
+        if r.status_code == 200:
+            return r.json()
+        return None
     except requests.RequestException:
-        return False
-
+        return None
 
 class AttackLog(BaseModel):
     timestamp: str
@@ -205,9 +218,8 @@ Write only the summary, nothing else."""
 
     response = requests.post(
         "http://host.docker.internal:11434/api/generate",
-        json={"model": "qwen2.5-coder:7b", "prompt": prompt, "stream": False},
+        json={"model": "qwen2.5-coder:7b", "prompt": prompt, "stream": False}
     )
-
     narrative = response.json().get("response", "Error generating narrative")
 
     incident = {
@@ -216,16 +228,22 @@ Write only the summary, nothing else."""
         "mitre_technique": technique_id,
         "timestamp": log.timestamp,
         "attacker_infrastructure": {
-            "source_ip": log.source_ip,
+            "source_ip": log.source_ip
         },
         "raw_log": log.dict(),
-        "ai_narrative": narrative,
+        "ai_narrative": narrative
     }
 
     save_incident(incident)
-    shared = submit_to_master(sanitize_report(incident))
-    return {**incident, "shared_with_master": shared}
 
+    custody_result = submit_for_custody(incident)
+    incident["custody_submission"] = custody_result
+
+    return {
+        **incident,
+        "pending_authority_review": custody_result is not None,
+        "submission_id": custody_result.get("submission_id") if custody_result else None,
+    }
 
 @app.get("/incidents")
 def get_incidents(_=Depends(require_role(ORG_ID))):
@@ -239,9 +257,17 @@ def get_sanitized():
 
 @app.post("/sync_reports")
 def sync_reports():
+    """Backfill: submit sanitized reports for all stored incidents into the
+    same custody review queue as /ingest. No bypass path exists anymore."""
     incidents = load_incidents()
-    sent = sum(1 for i in incidents if submit_to_master(sanitize_report(i)))
-    return {"org": ORG_ID, "reports_sent": sent, "total_incidents": len(incidents)}
+    submitted = 0
+    for inc in incidents:
+        if "evidence" not in inc:
+            continue
+        result = submit_for_custody(inc)
+        if result:
+            submitted += 1
+    return {"org": ORG_ID, "submissions_created": submitted, "total_incidents": len(incidents)}
 
 
 @app.get("/verify")

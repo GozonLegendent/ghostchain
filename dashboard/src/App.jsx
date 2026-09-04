@@ -10,7 +10,7 @@ function getNav(role) {
   if (!isAuthority) items.push({ to: "/incidents", label: "Live Incidents" });
   items.push({ to: "/campaigns", label: "Threat Campaigns" });
   items.push({ to: "/reports", label: "Sanitized Reports" });
-  if (!isAuthority) items.push({ to: "/evidence", label: "Evidence Vault" });
+  items.push({ to: "/evidence", label: "Evidence Vault" });
   items.push({ to: "/audit", label: isAuthority ? "Verdict Ledger" : "Audit Portal" });
   if (isAuthority) items.push({ to: "/analysis", label: "Network Analysis" });
   return items;
@@ -45,10 +45,10 @@ function HudTicker() {
   }, []);
 
   return (
-    <div className="flex items-center gap-4 font-mono text-[11px] text-cyan-400/70">
+    <div className="hidden lg:flex items-center gap-4 font-mono text-[11px] text-cyan-400/70">
       <span>{now.toISOString().slice(11, 19)} UTC</span>
-      <span className="text-cyan-500/50">{hex}</span>
-      <span className="hidden sm:inline">30.9010N 75.8573E</span>
+      <span className="hidden xl:inline text-cyan-500/50">{hex}</span>
+      <span className="hidden xl:inline">30.9010N 75.8573E</span>
       <span className="flex items-center gap-1.5 text-emerald-400">
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
         ONLINE
@@ -63,12 +63,12 @@ function IdentityBadge() {
 
   return (
     <div className="flex items-center gap-3 font-mono text-xs">
-      <span className="px-2 py-1 border border-cyan-500/30 rounded text-cyan-300/90">
+      <span className="hidden sm:inline px-2 py-1 border border-cyan-500/30 rounded text-cyan-300/90 whitespace-nowrap">
         {ROLE_LABELS[role]}
       </span>
       <button
         onClick={logout}
-        className="flex items-center gap-1 text-slate-500 hover:text-rose-300 transition-colors"
+        className="flex items-center gap-1 text-slate-500 hover:text-rose-300 transition-colors shrink-0"
       >
         <LogOut className="w-3.5 h-3.5" />
         <span className="hidden sm:inline">Exit</span>
@@ -102,22 +102,22 @@ export default function App() {
       ))}
 
       <header className="relative z-10 border-b border-cyan-500/20 bg-[#05070c]/80 backdrop-blur-sm">
-        <div className="flex items-center justify-between px-6 py-3 flex-wrap gap-3">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center px-6 py-3 gap-6">
+          <div className="flex items-center gap-2 shrink-0">
             <Hexagon className="w-6 h-6 text-cyan-400" strokeWidth={1.6} />
-            <span className="font-display text-lg text-cyan-100 tracking-wide">
+            <span className="font-display text-lg text-cyan-100 tracking-wide whitespace-nowrap">
               <GlitchText text="GHOSTCHAIN" />
             </span>
           </div>
 
-          <nav className="flex items-center gap-6 font-mono text-xs uppercase tracking-wider">
+          <nav className="flex items-center gap-4 md:gap-6 font-mono text-xs uppercase tracking-wider overflow-x-auto whitespace-nowrap flex-1 min-w-0 py-1">
             {NAV.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 end={item.to === "/"}
                 className={({ isActive }) =>
-                  `pb-1 border-b-2 transition-colors ${
+                  `shrink-0 pb-1 border-b-2 transition-colors ${
                     isActive
                       ? "border-cyan-400 text-cyan-300"
                       : "border-transparent text-slate-500 hover:text-cyan-300/80"
@@ -129,7 +129,7 @@ export default function App() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 shrink-0">
             <HudTicker />
             <IdentityBadge />
           </div>

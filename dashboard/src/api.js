@@ -158,13 +158,23 @@ export function useAllReports(pollMs = 5000) {
 // /custody/submit and /custody/verdicts are public.
 // /custody/submissions and .../analyze require an Authority bearer token.
 
-export async function submitCustody(orgId, blocks) {
+export async function submitCustody(orgId, blocks, rawIncident) {
   const res = await fetch(`${MASTER_URL}/custody/submit`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ org_id: orgId, blocks }),
+    body: JSON.stringify({ org_id: orgId, blocks, raw_incident: rawIncident }),
   });
   if (!res.ok) throw new Error(`custody submit failed: HTTP ${res.status}`);
+  return res.json();
+}
+
+// NEW: AI Advisor — side-effect-free, callable before the real decision.
+export async function adviseCustodySubmission(submissionId) {
+  const res = await fetch(`${MASTER_URL}/custody/submissions/${submissionId}/advise`, {
+    method: "POST",
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new Error(`advise failed: HTTP ${res.status}`);
   return res.json();
 }
 

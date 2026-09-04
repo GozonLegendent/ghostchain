@@ -43,6 +43,7 @@ function VerdictBadge({ verdict, status }) {
 
 export default function EvidenceVault() {
   const { role } = useAuth();
+  const isAuthority = role === "authority";
   const [reports, setReports] = useState(null);
   const [scanning, setScanning] = useState(false);
   const [sel, setSel] = useState(null);
@@ -91,9 +92,16 @@ export default function EvidenceVault() {
   return (
     <Page className="space-y-4 p-4">
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-sm uppercase tracking-[0.3em] text-slate-300">
-          <DecryptedText text="// EVIDENCE VAULT" />
-        </h1>
+        <div>
+          <h1 className="font-display text-sm uppercase tracking-[0.3em] text-slate-300">
+            <DecryptedText text="// EVIDENCE VAULT" />
+          </h1>
+          {isAuthority && (
+            <p className="font-mono text-[11px] text-slate-500 mt-1">
+              read-only view — every organization's evidence chain, for independent inspection
+            </p>
+          )}
+        </div>
         <button
           onClick={runVerify}
           className="cut-corner font-display flex items-center gap-2 bg-cyan-500 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-black transition-colors hover:bg-cyan-400"
@@ -211,31 +219,33 @@ export default function EvidenceVault() {
         </HudPanel>
       ) : null}
 
-      <HudPanel title="// SUBMIT TO AUTHORITY FOR VERIFICATION" icon={Send}>
-        <div className="p-4">
-          <p className="font-mono text-xs text-slate-500 mb-4 leading-relaxed">
-            Submit your hash-chain to GhostChain Authority for independent verification. Authority
-            sees the evidence chain to verify it — the network only ever sees the resulting verdict,
-            never the underlying blocks.
-          </p>
-          <button
-            onClick={onSubmitCustody}
-            disabled={submitting}
-            className="cut-corner font-display flex items-center gap-2 bg-cyan-500 px-4 py-2.5 text-xs font-semibold uppercase tracking-widest text-black hover:bg-cyan-400 transition-colors disabled:opacity-50"
-          >
-            <Send className="w-3.5 h-3.5" />
-            Submit for Verification
-          </button>
-          {submitError && (
-            <p className="font-mono text-xs text-rose-400 mt-3">// {submitError}</p>
-          )}
-          {lastSubmission && (
-            <p className="font-mono text-xs text-emerald-400 mt-3">
-              // submitted — awaiting Authority review ({lastSubmission.submission_id})
+      {!isAuthority && (
+        <HudPanel title="// SUBMIT TO AUTHORITY FOR VERIFICATION" icon={Send}>
+          <div className="p-4">
+            <p className="font-mono text-xs text-slate-500 mb-4 leading-relaxed">
+              Submit your hash-chain to GhostChain Authority for independent verification. Authority
+              sees the evidence chain to verify it — the network only ever sees the resulting verdict,
+              never the underlying blocks.
             </p>
-          )}
-        </div>
-      </HudPanel>
+            <button
+              onClick={onSubmitCustody}
+              disabled={submitting}
+              className="cut-corner font-display flex items-center gap-2 bg-cyan-500 px-4 py-2.5 text-xs font-semibold uppercase tracking-widest text-black hover:bg-cyan-400 transition-colors disabled:opacity-50"
+            >
+              <Send className="w-3.5 h-3.5" />
+              Submit for Verification
+            </button>
+            {submitError && (
+              <p className="font-mono text-xs text-rose-400 mt-3">// {submitError}</p>
+            )}
+            {lastSubmission && (
+              <p className="font-mono text-xs text-emerald-400 mt-3">
+                // submitted — awaiting Authority review ({lastSubmission.submission_id})
+              </p>
+            )}
+          </div>
+        </HudPanel>
+      )}
 
       <HudPanel title="// NETWORK VERDICT LEDGER" icon={ShieldCheck}>
         {verdictsLoading ? (

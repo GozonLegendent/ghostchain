@@ -6,11 +6,13 @@ import {
   ScanLine,
   Clock,
   Search,
+  Sparkles,
 } from "lucide-react";
 import { useAuth, ROLES } from "../auth";
 import {
   useCustodySubmissions,
   analyzeCustodySubmission,
+  adviseCustodySubmission,
   useVerdicts,
 } from "../api";
 import Page from "../components/Page";
@@ -50,9 +52,46 @@ function VerdictBadge({ verdict, status }) {
   );
 }
 
+function AdvisorBadge({ recommendation }) {
+  if (!recommendation) return null;
+  const approve = recommendation.toLowerCase() === "approve";
+  return (
+    <span
+      className={`flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 border rounded ${
+        approve
+          ? "border-cyan-400/40 text-cyan-300"
+          : "border-orange-400/40 text-orange-300"
+      }`}
+    >
+      <Sparkles className="w-3 h-3" /> AI: {recommendation.toUpperCase()}
+    </span>
+  );
+}
+
 function AuthorityView() {
   const { submissions, loading, refresh } = useCustodySubmissions();
   const [analyzing, setAnalyzing] = useState(null);
+  const [advising, setAdvising] = useState(null);
+  const [advice, setAdvice] = useState({}); // { [submission_id]: { recommendation, reasoning, source } }
+
+  async function onAdvise(submissionId) {
+    setAdvising(submissionId);
+    try {
+      const result = await adviseCustodySubmission(submissionId);
+      setAdvice((prev) => ({ ...prev, [submissionId]: result }));
+    } catch (err) {
+      setAdvice((prev) => ({
+        ...prev,
+        [submissionId]: {
+          recommendation: "unknown",
+          reasoning: "advisor unreachable — proceed on cryptographic verdict alone",
+          source: "error",
+        },
+      }));
+    } finally {
+      setAdvising(null);
+    }
+  }
 
   async function onAnalyze(submissionId) {
     setAnalyzing(submissionId);
@@ -81,27 +120,52 @@ function AuthorityView() {
         ) : (
           <div className="divide-y divide-slate-800">
             {pending.map((s) => (
-              <div key={s.submission_id} className="flex items-center justify-between p-4">
-                <div>
-                  <div className="font-mono text-sm text-cyan-200">
-                    {s.org_id.toUpperCase()}
+              <div key={s.submission_id} className="p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-mono text-sm text-cyan-200">
+                      {s.org_id.toUpperCase()}
+                    </div>
+                    <div className="font-mono text-[11px] text-slate-500 mt-0.5">
+                      {s.blocks.length} block{s.blocks.length > 1 ? "s" : ""} · submitted {fmtTime(s.submitted_at)}
+                    </div>
                   </div>
-                  <div className="font-mono text-[11px] text-slate-500 mt-0.5">
-                    {s.blocks.length} block{s.blocks.length > 1 ? "s" : ""} · submitted {fmtTime(s.submitted_at)}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => onAdvise(s.submission_id)}
+                      disabled={advising === s.submission_id}
+                      className="cut-corner font-display flex items-center gap-2 border border-cyan-400/50 px-3 py-2 text-xs font-semibold uppercase tracking-widest text-cyan-300 hover:bg-cyan-400/10 transition-colors disabled:opacity-50"
+                    >
+                      {advising === s.submission_id ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Sparkles className="w-3.5 h-3.5" />
+                      )}
+                      AI Opinion
+                    </button>
+                    <button
+                      onClick={() => onAnalyze(s.submission_id)}
+                      disabled={analyzing === s.submission_id}
+                      className="cut-corner font-display flex items-center gap-2 bg-cyan-500 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-black hover:bg-cyan-400 transition-colors disabled:opacity-50"
+                    >
+                      {analyzing === s.submission_id ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <ScanLine className="w-3.5 h-3.5" />
+                      )}
+                      Analyze
+                    </button>
                   </div>
                 </div>
-                <button
-                  onClick={() => onAnalyze(s.submission_id)}
-                  disabled={analyzing === s.submission_id}
-                  className="cut-corner font-display flex items-center gap-2 bg-cyan-500 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-black hover:bg-cyan-400 transition-colors disabled:opacity-50"
-                >
-                  {analyzing === s.submission_id ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <ScanLine className="w-3.5 h-3.5" />
-                  )}
-                  Analyze
-                </button>
+
+                {advice[s.submission_id] && (
+                  <div className="flex items-start gap-2 bg-slate-900/60 border border-slate-800 rounded p-2.5">
+                    <AdvisorBadge recommendation={advice[s.submission_id].recommendation} />
+                    <p className="font-mono text-[11px] text-slate-400 flex-1">
+                      {advice[s.submission_id].reasoning}
+                    </p>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -121,6 +185,7 @@ function AuthorityView() {
                   <div className="font-mono text-sm text-cyan-200">{s.org_id.toUpperCase()}</div>
                   <div className="font-mono text-[11px] text-slate-500 mt-0.5">
                     analyzed {fmtTime(s.analyzed_at)}
+                    {s.released ? " · released to network" : " · not released"}
                   </div>
                 </div>
                 <VerdictBadge verdict={s.verdict} status={s.status} />

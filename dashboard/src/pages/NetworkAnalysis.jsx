@@ -35,6 +35,9 @@ export default function NetworkAnalysis() {
   const verified = verdicts.filter((s) => s.verdict === "VERIFIED").length;
   const tampered = verdicts.filter((s) => s.verdict === "TAMPERED").length;
   const pending = verdicts.filter((s) => s.status === "pending").length;
+  const released = verdicts.filter((s) => s.released).length;
+
+  const integrityRate = total > 0 ? Math.round((verified / total) * 100) : 0;
 
   const byOrg = verdicts.reduce((acc, s) => {
     acc[s.org_id] = acc[s.org_id] || { total: 0, verified: 0, tampered: 0, pending: 0 };
@@ -76,6 +79,25 @@ export default function NetworkAnalysis() {
         <Stat icon={Activity} label="Pending" value={pending} hint="awaiting review" />
       </div>
 
+      <HudPanel title="// NETWORK INTEGRITY RATE" icon={ShieldCheck}>
+        <div className="p-4 space-y-2">
+          <div className="flex items-center justify-between font-mono text-[10px] text-slate-500">
+            <span>VERIFIED / TOTAL SUBMISSIONS</span>
+            <span className="text-emerald-300">{integrityRate}%</span>
+          </div>
+          <div className="w-full h-2.5 bg-slate-800 rounded overflow-hidden">
+            <div
+              className="h-full bg-emerald-400 transition-all duration-700"
+              style={{ width: `${integrityRate}%` }}
+            />
+          </div>
+          <div className="flex items-center justify-between font-mono text-[10px] text-slate-500 pt-1">
+            <span>{released} of {total} submissions released to network</span>
+            <span>{total - released} withheld or pending</span>
+          </div>
+        </div>
+      </HudPanel>
+
       <HudPanel title="// PER-ORG TRUST SIGNAL" icon={Radar}>
         {loading ? (
           <div className="p-6 text-center font-mono text-xs text-slate-500">loading…</div>
@@ -85,19 +107,45 @@ export default function NetworkAnalysis() {
           </div>
         ) : (
           <div className="divide-y divide-slate-800">
-            {Object.entries(byOrg).map(([org, stats]) => (
-              <div key={org} className="flex items-center justify-between p-4">
-                <span className="font-mono text-sm text-cyan-200">{org.toUpperCase()}</span>
-                <div className="flex items-center gap-4 font-mono text-[11px] text-slate-400">
-                  <span>{stats.total} submitted</span>
-                  <span className="text-emerald-400">{stats.verified} verified</span>
-                  <span className="text-rose-400">{stats.tampered} tampered</span>
-                  {stats.pending > 0 ? (
-                    <span className="text-amber-400">{stats.pending} pending</span>
-                  ) : null}
+            {Object.entries(byOrg).map(([org, stats]) => {
+              const orgIntegrity =
+                stats.total > 0 ? Math.round((stats.verified / stats.total) * 100) : 0;
+              return (
+                <div key={org} className="p-4 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-sm text-cyan-200">{org.toUpperCase()}</span>
+                    <div className="flex items-center gap-4 font-mono text-[11px] text-slate-400">
+                      <span>{stats.total} submitted</span>
+                      <span className="text-emerald-400">{stats.verified} verified</span>
+                      <span className="text-rose-400">{stats.tampered} tampered</span>
+                      {stats.pending > 0 ? (
+                        <span className="text-amber-400">{stats.pending} pending</span>
+                      ) : null}
+                    </div>
+                  </div>
+                  <div className="w-full h-1.5 rounded overflow-hidden flex bg-slate-800">
+                    {stats.verified > 0 && (
+                      <div
+                        className="h-full bg-emerald-400"
+                        style={{ width: `${(stats.verified / stats.total) * 100}%` }}
+                      />
+                    )}
+                    {stats.tampered > 0 && (
+                      <div
+                        className="h-full bg-rose-500"
+                        style={{ width: `${(stats.tampered / stats.total) * 100}%` }}
+                      />
+                    )}
+                    {stats.pending > 0 && (
+                      <div
+                        className="h-full bg-amber-400"
+                        style={{ width: `${(stats.pending / stats.total) * 100}%` }}
+                      />
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </HudPanel>

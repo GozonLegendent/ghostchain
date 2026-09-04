@@ -5,20 +5,39 @@ import GlitchText from "../components/GlitchText";
 import { lookupIdentifier } from "../api";
 
 export default function PersonalAudit() {
-  const [identifier, setIdentifier] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [checking, setChecking] = useState(false);
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
 
   async function handleCheck(e) {
     e.preventDefault();
-    if (!identifier.trim()) return;
+    if (!username.trim() || !email.trim()) return;
     setChecking(true);
     setError(null);
     setResults(null);
     try {
-      const res = await lookupIdentifier(identifier.trim());
-      setResults(res);
+      const [byUsername, byEmail] = await Promise.all([
+        lookupIdentifier(username.trim()),
+        lookupIdentifier(email.trim()),
+      ]);
+
+      const merged = byUsername.map((u, i) => {
+        const e2 = byEmail[i];
+        if (!u.data && !e2.data) return { org: u.org, data: null };
+        const exposed = Boolean(u.data?.exposed) || Boolean(e2.data?.exposed);
+        return {
+          org: u.org,
+          data: {
+            org: u.org.id,
+            exposed,
+            matches: [],
+          },
+        };
+      });
+
+      setResults(merged);
     } catch (err) {
       setError("could not reach the network — try again");
     } finally {
@@ -50,21 +69,30 @@ export default function PersonalAudit() {
             </h1>
           </div>
           <p className="text-xs font-mono text-slate-500 mb-5 leading-relaxed">
-            Submit your identifier below. We check it against every participating organization's
-            breach records and return only a match/no-match signal — never anyone's full dataset.
+            Submit your username and email below. Each is cryptographically checked against every
+            participating organization's breach commitments using zero-knowledge Merkle proofs —
+            we return only a match/no-match signal, and no organization ever sees your plaintext
+            identifiers or full dataset.
           </p>
 
           <form onSubmit={handleCheck} className="space-y-3">
             <input
               type="text"
-              placeholder="you@example.com or username"
-              value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
+              placeholder="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full bg-slate-950/60 border border-slate-800 focus:border-cyan-400/60 outline-none px-4 py-2.5 font-mono text-sm text-slate-200 cut-corner"
+            />
+            <input
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-slate-950/60 border border-slate-800 focus:border-cyan-400/60 outline-none px-4 py-2.5 font-mono text-sm text-slate-200 cut-corner"
             />
             <button
               type="submit"
-              disabled={checking}
+              disabled={checking || !username.trim() || !email.trim()}
               className="cut-corner font-display flex items-center justify-center gap-2 w-full bg-cyan-500 py-2.5 text-sm font-semibold uppercase tracking-widest text-black transition-colors hover:bg-cyan-400 disabled:opacity-50"
             >
               {checking ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
@@ -110,15 +138,6 @@ export default function PersonalAudit() {
                       <span className="font-mono text-[10px] text-emerald-300">CLEAR</span>
                     )}
                   </div>
-                  {data?.exposed && data.matches?.length > 0 && (
-                    <div className="mt-2 space-y-1">
-                      {data.matches.map((m, i) => (
-                        <p key={i} className="font-mono text-[10px] text-slate-500">
-                          {m.attack_type} · {m.endpoint} · {m.timestamp}
-                        </p>
-                      ))}
-                    </div>
-                  )}
                 </div>
               ))}
             </div>

@@ -1,32 +1,41 @@
 [
   {
-    "submission_id": "sub_org_a_1787768631",
+    "submission_id": "sub_org_a_1788537071",
     "org_id": "org_a",
-    "submitted_at": "2026-08-26T18:23:51Z",
+    "submitted_at": "2026-09-04T15:51:11Z",
     "blocks": [
       {
         "block_index": 0,
-        "timestamp": "2026-08-06T18:14:00Z",
-        "attack_type": "Credential Stuffing",
-        "block_hash": "3937622774a190b743e3b658b482b188034dba754493eda7bee5dfdee4bedc8b",
         "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-        "content_intact": true,
-        "link_intact": true,
-        "status": "VALID"
-      },
-      {
-        "block_index": 1,
-        "timestamp": "2026-08-06T18:16:00Z",
-        "attack_type": "Credential Stuffing",
-        "block_hash": "ac43bf85f97693d483bedddca4a5f3489a0d90cf255bf9748af08187bf7e81b1",
-        "prev_hash": "3937622774a190b743e3b658b482b188034dba754493eda7bee5dfdee4bedc8b",
-        "content_intact": true,
-        "link_intact": true,
-        "status": "VALID"
+        "block_hash": "eac61dbd62591d72363cc976dc5efd640e6cedde676be64b2e3300093fc95a8d"
       }
     ],
+    "raw_incident": {
+      "source_org": "org_a",
+      "attack_type": "Credential Stuffing",
+      "mitre_technique": "T1110.004",
+      "timestamp": "2026-09-05T09:00:00Z",
+      "attacker_infrastructure": {
+        "source_ip": "203.0.113.55"
+      },
+      "raw_log": {
+        "timestamp": "2026-09-05T09:00:00Z",
+        "source_ip": "203.0.113.55",
+        "endpoint": "/api/login",
+        "attack_type": "Credential Stuffing",
+        "request_payload": "user=test&pass=test",
+        "response_code": 401
+      },
+      "ai_narrative": "On 2026-09-05 at 09:00 UTC, an attacker from IP address 203.0.113.55 attempted to exploit a credential stuffing vulnerability by submitting login credentials (user=test&pass=test) to the /api/login endpoint. The attack resulted in a 401 Unauthorized response.",
+      "evidence": {
+        "block_index": 0,
+        "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "block_hash": "eac61dbd62591d72363cc976dc5efd640e6cedde676be64b2e3300093fc95a8d"
+      }
+    },
     "status": "analyzed",
-    "verdict": "TAMPERED",
-    "analyzed_at": "2026-08-26T18:41:12Z"
+    "verdict": "VERIFIED",
+    "analyzed_at": "2026-09-04T15:52:55Z",
+    "released": true
   }
 ]
